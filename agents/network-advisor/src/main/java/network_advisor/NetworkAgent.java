@@ -1,0 +1,23 @@
+package network_advisor;
+
+import jade.core.Agent;
+import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
+
+public class NetworkAgent extends Agent {
+
+    @Override
+    protected void setup() {
+        this.subscribeToNetworkData();
+    }
+
+    private void subscribeToNetworkData() {
+        //TODO monitor network
+    }
+
+    /**
+     * Informs quote manager of expected inbalancement withing microgrid.
+     */
+    private void inform(final ExpectedInbalancement expectedInbalancement) {
+        //TODO
+    }
+}
