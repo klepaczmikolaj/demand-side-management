@@ -1,4 +1,4 @@
-package network_advisor;
+package pl.wut.wsd.dsm.agent.network_advisor;
 
 import jade.core.Agent;
 import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
