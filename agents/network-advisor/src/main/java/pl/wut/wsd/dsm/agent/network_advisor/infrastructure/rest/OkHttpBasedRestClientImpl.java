@@ -9,7 +9,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -51,16 +50,6 @@ class OkHttpBasedRestClientImpl implements RestClient {
 
     private Request.Builder rqBuilder(final HttpUrl httpUrl) {
         return new Request.Builder().url(httpUrl);
-    }
-
-    public static void main(final String[] args) {
-        final OkHttpBasedRestClientImpl client = new OkHttpBasedRestClientImpl();
-        final Map<String, String> params = new HashMap<>();
-        params.put("appid", "d250a33a932b1f3ea88676644df45ae3");
-        params.put("q", "London,uk");
-        params.put("units", "metric");
-        final Map s = client.get("http://api.openweathermap.org/data/2.5/weather", Map.class, params);
-        System.out.println(s);
     }
 
 }
