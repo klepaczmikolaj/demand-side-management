@@ -5,8 +5,12 @@ import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
 
 public class NetworkAgent extends Agent {
 
+    private NetworkAgentDependencies dependencies;
+
     @Override
     protected void setup() {
+        dependencies = (NetworkAgentDependencies) this.getArguments()[0];
+        WeatherForecaster.bindToAgent(this, dependencies.weatherAdapter(), dependencies.weatherRefreshDuration());
         this.subscribeToNetworkData();
     }
 
@@ -20,4 +24,6 @@ public class NetworkAgent extends Agent {
     private void inform(final ExpectedInbalancement expectedInbalancement) {
         //TODO
     }
+
+
 }

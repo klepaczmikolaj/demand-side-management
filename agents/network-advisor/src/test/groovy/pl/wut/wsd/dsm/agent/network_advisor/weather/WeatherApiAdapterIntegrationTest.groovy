@@ -8,7 +8,7 @@ import spock.lang.Subject
 class WeatherApiAdapterIntegrationTest extends Specification {
 
     @Subject
-    private final WeatherApiAdapter weatherApiAdapter = new WeatherApiAdapter()
+    private final WeatherApiAdapter weatherApiAdapter = new WeatherApiAdapter(restClient, apiKey, weatherForecastUrl, weatherForecastCityAndCountryCode)
 
     def 'Should call weather api with no exceptions'() {
         when:

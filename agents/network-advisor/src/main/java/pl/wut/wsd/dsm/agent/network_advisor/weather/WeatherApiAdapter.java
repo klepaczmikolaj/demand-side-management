@@ -8,15 +8,17 @@ import java.util.Map;
 
 class WeatherApiAdapter implements WeatherAdapter {
 
-    private final RestClient restClient = RestClient.defaultClient();
-    private static final String apiKey = "d250a33a932b1f3ea88676644df45ae3";
+    private final RestClient restClient;
+    private final String apiKey;
 
     private final Map<String, String> queryParams;
 
-    public WeatherApiAdapter() {
+    public WeatherApiAdapter(final RestClient restClient, final String apiKey, final String weatherForecastCityAndCountryCode) {
+        this.restClient = restClient;
+        this.apiKey = apiKey;
         this.queryParams = new HashMap<>();
-        queryParams.put("appid", apiKey);
-        queryParams.put("q", "Warsaw,pl");
+        queryParams.put("appid", this.apiKey);
+        queryParams.put("q", weatherForecastCityAndCountryCode);
         queryParams.put("units", "metric");
     }
 
