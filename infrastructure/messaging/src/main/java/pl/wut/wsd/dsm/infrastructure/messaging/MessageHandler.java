@@ -22,6 +22,7 @@ public class MessageHandler extends CyclicBehaviour {
     public void action() {
         final ACLMessage message = myAgent.receive();
         if (message != null) {
+            log.info("Handler for {} received message {}", myAgent.getClass().getSimpleName(), message);
             specifications.stream()
                     .filter(s -> s.getTemplateToMatch().match(message))
                     .map(MessageSpecification::getAction)

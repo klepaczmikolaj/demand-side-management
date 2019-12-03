@@ -47,6 +47,6 @@ public class NetworkAgentApplication {
         profile.setParameter(Profile.PLATFORM_ID, "wsd-dsm");
         profile.setParameter(Profile.CONTAINER_NAME, "main-container");
         profile.setParameter("gui", Boolean.toString(true));
-        return runtime.createAgentContainer(profile);
+        return runtime.createMainContainer(profile);
     }
 }
