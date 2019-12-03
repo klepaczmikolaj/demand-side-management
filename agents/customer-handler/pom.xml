@@ -13,24 +13,35 @@
 
     <dependencies>
         <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>customer-ontology</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>draft-protocol</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>infrastructure-messaging</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-java8</artifactId>
-            <version>${hibernate.version}</version>
         </dependency>
     </dependencies>
 

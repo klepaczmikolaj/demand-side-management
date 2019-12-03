@@ -1,10 +1,12 @@
 package pl.wut.dsm.ontology.customer;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@ToString
-@EqualsAndHashCode
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
     private Long customerId;
 }

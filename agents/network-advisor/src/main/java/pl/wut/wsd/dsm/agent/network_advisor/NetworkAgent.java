@@ -10,7 +10,12 @@ public class NetworkAgent extends Agent {
     @Override
     protected void setup() {
         dependencies = (NetworkAgentDependencies) this.getArguments()[0];
+        // monitoruj pogode
         WeatherForecaster.bindToAgent(this, dependencies.weatherAdapter(), dependencies.weatherRefreshDuration());
+        //przewiduj zużycie
+
+        //przewiduj produkcje
+
         this.subscribeToNetworkData();
     }
 

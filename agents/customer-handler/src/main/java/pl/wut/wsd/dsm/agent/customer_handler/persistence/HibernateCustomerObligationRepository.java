@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-class HibernateCustomerObligationRepository implements CustomerObligationRepository {
+public class HibernateCustomerObligationRepository implements CustomerObligationRepository {
 
     private final HibernateTemplate hibernateTemplate;
 

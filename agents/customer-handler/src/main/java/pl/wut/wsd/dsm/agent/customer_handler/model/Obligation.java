@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import java.time.ZonedDateTime;
 
 @Data
 @Entity
@@ -14,7 +15,7 @@ import javax.persistence.Table;
 public class Obligation extends Identifiable<Long> {
 
     @Column(name = "CUSTOMER_ID")
-    private String customerId;
+    private Long customerId;
 
     @Column(name = "STATE")
     @Enumerated(EnumType.STRING)
@@ -31,4 +32,16 @@ public class Obligation extends Identifiable<Long> {
      */
     @Column(name = "PERCENTAGE_KEPT")
     private double perecentageKept;
+
+    /**
+     * Obligation period start time.
+     */
+    @Column(name = "SINCE")
+    private ZonedDateTime since;
+
+    /**
+     * Obligation period end time.
+     */
+    @Column(name = "until")
+    private ZonedDateTime until;
 }

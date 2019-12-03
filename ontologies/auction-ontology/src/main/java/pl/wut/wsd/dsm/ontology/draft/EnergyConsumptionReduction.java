@@ -1,12 +1,12 @@
-package pl.wut.wsd.dsm.ontology.auction;
+package pl.wut.wsd.dsm.ontology.draft;
 
 import lombok.Data;
 
 import java.time.ZonedDateTime;
 
 @Data
-public class EnergyConsumptionIncrease {
-    private double notUnder;
+public class EnergyConsumptionReduction {
+    private double notExceeding;
     private ZonedDateTime since;
     private ZonedDateTime until;
 }

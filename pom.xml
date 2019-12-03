@@ -10,6 +10,8 @@
     <modules>
         <module>agents</module>
         <module>ontologies</module>
+        <module>infrastructure</module>
+        <module>protocols</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -23,6 +25,14 @@
         <logback.version>1.2.3</logback.version>
         <okhttp.version>4.2.2</okhttp.version>
         <hibernate.version>5.4.9.Final</hibernate.version>
+        <infrastructure.messaging.version>1.0-SNAPSHOT</infrastructure.messaging.version>
+        <!-- ++++++++++++++++++++Ontologies++++++++++++++++++++-->
+        <trust.ontology.version>1.0-SNAPSHOT</trust.ontology.version>
+        <customer.ontology.verion>1.0-SNAPSHOT</customer.ontology.verion>
+        <auction.ontology.version>1.0-SNAPSHOT</auction.ontology.version>
+        <!-- ++++++++++++++++++++Protocols++++++++++++++++++++-->
+        <protocol.commons.version>1.0-SNAPSHOT</protocol.commons.version>
+        <draft.protocol.version>1.0-SNAPSHOT</draft.protocol.version>
         <mysql.connector.version>8.0.18</mysql.connector.version>
         <maven.compiler.version>3.8.1</maven.compiler.version>
     </properties>
@@ -43,9 +53,75 @@
                 <version>${gson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.tilab.jade</groupId>
+                <artifactId>jade</artifactId>
+                <version>${jade.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-java8</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>infrastructure-messaging</artifactId>
+                <version>${infrastructure.messaging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>customer-ontology</artifactId>
+                <version>${customer.ontology.verion}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>trust-ontology</artifactId>
+                <version>${trust.ontology.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>auction-ontology</artifactId>
+                <version>${auction.ontology.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>protocol-commons</artifactId>
+                <version>${protocol.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>draft-protocol</artifactId>
+                <version>${draft.protocol.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

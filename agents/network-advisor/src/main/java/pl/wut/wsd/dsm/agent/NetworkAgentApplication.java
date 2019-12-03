@@ -28,7 +28,6 @@ public class NetworkAgentApplication {
         final RestClient restClient = RestClient.defaultClient();
         final WeatherAdapter weatherAdapter = WeatherAdapter.apiAdapter(restClient, weatherForecastApiKey, weatherforecastCity, weatherForecastCountryCode);
 
-
         final AgentContainer mainContainer = createAgentContainer();
 
         log.info("Starting network-agent");
@@ -48,6 +47,6 @@ public class NetworkAgentApplication {
         profile.setParameter(Profile.PLATFORM_ID, "wsd-dsm");
         profile.setParameter(Profile.CONTAINER_NAME, "main-container");
         profile.setParameter("gui", Boolean.toString(true));
-        return runtime.createMainContainer(profile);
+        return runtime.createAgentContainer(profile);
     }
 }

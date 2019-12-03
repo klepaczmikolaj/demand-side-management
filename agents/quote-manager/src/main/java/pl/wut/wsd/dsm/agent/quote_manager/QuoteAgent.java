@@ -1,7 +1,7 @@
 package pl.wut.wsd.dsm.agent.quote_manager;
 
 import jade.core.Agent;
-import pl.wut.wsd.dsm.ontology.auction.CustomerObligation;
+import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 
 public class QuoteAgent extends Agent {
 

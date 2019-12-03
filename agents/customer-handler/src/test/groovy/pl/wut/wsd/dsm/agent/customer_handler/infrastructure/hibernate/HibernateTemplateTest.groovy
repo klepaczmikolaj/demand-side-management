@@ -5,6 +5,7 @@ import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation
 import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation_
 import spock.lang.Specification
 
+import java.time.ZonedDateTime
 
 class HibernateTemplateTest extends Specification {
 
@@ -21,10 +22,12 @@ class HibernateTemplateTest extends Specification {
     def 'Should save object and fetch it by id'() {
         given:
         final Obligation obligation = new Obligation(
-                customerId: UUID.randomUUID().toString(),
+                customerId: new Random().nextLong(),
                 state: CustomerObligationState.DURING_EVALUATION,
                 sizeKws: 100.50,
-                perecentageKept: 21.35
+                perecentageKept: 21.35,
+                since: ZonedDateTime.now(),
+                until: ZonedDateTime.now().plusDays(2)
         )
 
         when:
@@ -43,10 +46,12 @@ class HibernateTemplateTest extends Specification {
     def 'Should update object'() {
         given:
         final Obligation obligation = new Obligation(
-                customerId: UUID.randomUUID().toString(),
+                customerId: new Random().nextLong(),
                 state: CustomerObligationState.DURING_EVALUATION,
                 sizeKws: 100.50,
-                perecentageKept: 21.35
+                perecentageKept: 21.35,
+                since: ZonedDateTime.now(),
+                until: ZonedDateTime.now().plusDays(2)
         )
 
         when:
@@ -69,22 +74,24 @@ class HibernateTemplateTest extends Specification {
 
     def 'Should filter by specification'() {
         given:
-        saveObligationForCustomer('1')
-        saveObligationForCustomer('2')
-        saveObligationForCustomer('3')
+        saveObligationForCustomer(1)
+        saveObligationForCustomer(2)
+        saveObligationForCustomer(3)
 
         expect:
-        template.findOne({ final r, final cb -> cb.equal(r.get(Obligation_.customerId), '1') }, Obligation.class).isPresent()
+        template.findOne({ final r, final cb -> cb.equal(r.get(Obligation_.customerId), 1L) }, Obligation.class).isPresent()
         and:
         !template.findOne({ final r, final cb -> cb.equal(r.get(Obligation_.customerId), '1234') }, Obligation.class).isPresent()
     }
 
-    private Obligation saveObligationForCustomer(final String customerId) {
+    private Obligation saveObligationForCustomer(final Long customerId) {
         final Obligation obligation = new Obligation(
                 customerId: customerId,
                 state: CustomerObligationState.DURING_EVALUATION,
                 sizeKws: 100.50,
-                perecentageKept: 21.35
+                perecentageKept: 21.35,
+                since: ZonedDateTime.now(),
+                until: ZonedDateTime.now().plusDays(2)
         )
         template.saveOrUpdate(obligation)
         return obligation

@@ -1,6 +1,6 @@
 package pl.wut.wsd.dsm.agent.network_advisor.weather
 
-
+import pl.wut.wsd.dsm.agent.network_advisor.infrastructure.rest.RestClient
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -8,7 +8,7 @@ import spock.lang.Subject
 class WeatherApiAdapterIntegrationTest extends Specification {
 
     @Subject
-    private final WeatherApiAdapter weatherApiAdapter = new WeatherApiAdapter(restClient, apiKey, weatherForecastUrl, weatherForecastCityAndCountryCode)
+    private final WeatherApiAdapter weatherApiAdapter = new WeatherApiAdapter(RestClient.defaultClient(), "d250a33a932b1f3ea88676644df45ae3", "Warsaw,pl")
 
     def 'Should call weather api with no exceptions'() {
         when:
