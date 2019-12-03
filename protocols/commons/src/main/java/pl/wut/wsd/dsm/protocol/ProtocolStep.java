@@ -1,6 +1,5 @@
 package pl.wut.wsd.dsm.protocol;
 
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.MessageTemplate;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +19,6 @@ public class ProtocolStep<T extends Protocol> {
     @Getter
     private final boolean required;
 
-    @Getter
-    private final ServiceDescription targetService;
 
     @Getter
     private final Class<?> messageClass;
@@ -29,16 +26,14 @@ public class ProtocolStep<T extends Protocol> {
     private final T protocol;
 
     @Builder
-    private ProtocolStep(@NonNull final String stepName,
-                         @NonNull final int performative,
-                         @NonNull final boolean required,
-                         @NonNull final ServiceDescription targetService,
-                         @NonNull final Class<?> messageClass,
-                         @NonNull final T protocol) {
+    protected ProtocolStep(@NonNull final String stepName,
+                           @NonNull final int performative,
+                           @NonNull final boolean required,
+                           @NonNull final Class<?> messageClass,
+                           @NonNull final T protocol) {
         this.stepName = Objects.requireNonNull(stepName);
         this.performative = performative;
         this.required = required;
-        this.targetService = Objects.requireNonNull(targetService);
         this.messageClass = messageClass;
         this.protocol = protocol;
     }

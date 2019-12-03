@@ -1,0 +1,23 @@
+package pl.wut.wsd.dsm.protocol;
+
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+
+public class TargetedStep<T extends Protocol> extends ProtocolStep<T> {
+
+    @Getter
+    private final ServiceDescription targetService;
+
+    @Builder
+    protected TargetedStep(@NonNull final String stepName,
+                           @NonNull final int performative,
+                           @NonNull final boolean required,
+                           @NonNull final Class<?> messageClass,
+                           @NonNull final T protocol,
+                           @NonNull final ServiceDescription targetService) {
+        super(stepName, performative, required, messageClass, protocol);
+        this.targetService = targetService;
+    }
+}

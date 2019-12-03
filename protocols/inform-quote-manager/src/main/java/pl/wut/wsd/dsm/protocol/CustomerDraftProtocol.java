@@ -1,46 +1,39 @@
 package pl.wut.wsd.dsm.protocol;
 
 import jade.domain.FIPAAgentManagement.Property;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 
-import java.util.Objects;
+import static jade.lang.acl.ACLMessage.ACCEPT_PROPOSAL;
+import static jade.lang.acl.ACLMessage.CFP;
 
 @Accessors(fluent = true)
 public class CustomerDraftProtocol extends Protocol {
 
     @Getter
-    private final ProtocolStep sendClientOffer;
+    private final SendClientOffer sendClientOffer;
 
     @Getter
     /** Send client decision to quote manager. */
     private final ProtocolStep sendClientDecision;
 
     @Getter
-    private final ProtocolStep acceptClientDecision;
+    private final AcceptClientDecision acceptClientDecision;
 
-    public static CustomerDraftProtocol forCustomer(final Customer customer) {
-        return new CustomerDraftProtocol(Objects.requireNonNull(customer));
-    }
 
-    private CustomerDraftProtocol(final Customer customer) {
+    public CustomerDraftProtocol() {
         final ServiceDescriptionFactory factory = new ServiceDescriptionFactory();
 
-        sendClientOffer = ProtocolStep.builder()
-                .stepName("Send client offer")
-                .performative(ACLMessage.CFP)
-                .required(true)
-                .messageClass(CustomerOffer.class)
-                .targetService(factory.nameAndProperties("customer-handler", new Property("customerId", customer.getCustomerId())))
-                .protocol(this)
-                .build();
+        sendClientOffer = new SendClientOffer(this);
 
-        sendClientDecision = ProtocolStep.builder()
+        sendClientDecision = TargetedStep.builder()
                 .stepName("Send client decision")
                 .performative(ACLMessage.PROPOSE)
                 .required(false)
@@ -49,15 +42,32 @@ public class CustomerDraftProtocol extends Protocol {
                 .protocol(this)
                 .build();
 
-        acceptClientDecision = ProtocolStep.builder()
-                .stepName("Accept client decision")
-                .performative(ACLMessage.ACCEPT_PROPOSAL)
-                .required(false)
-                .targetService(factory.nameAndProperties("customer-handler", new Property("customerId", customer.getCustomerId())))
-                .messageClass(CustomerObligation.class)
-                .protocol(this)
-                .build();
+        acceptClientDecision = new AcceptClientDecision(this);
     }
 
+    public static class SendClientOffer extends ProtocolStep<CustomerDraftProtocol> {
+        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
+        private SendClientOffer(final @NonNull CustomerDraftProtocol protocol) {
+            super("Send client offer", CFP, true, CustomerOffer.class, protocol);
+        }
+
+        public ServiceDescription serviceDescription(final Customer targetCustomer) {
+            return serviceDescriptionFactory.
+                    nameAndProperties("customer-handler", new Property("customerId", targetCustomer.getCustomerId()));
+        }
+    }
+
+    public static class AcceptClientDecision extends ProtocolStep<CustomerDraftProtocol> {
+        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
+
+        protected AcceptClientDecision(final @NonNull CustomerDraftProtocol protocol) {
+            super("Send client decision", ACCEPT_PROPOSAL, false, CustomerObligation.class, protocol);
+        }
+
+        public ServiceDescription serviceDescription(final Customer targetCustomer) {
+            return serviceDescriptionFactory
+                    .nameAndProperties("customer-handler", new Property("customerId", targetCustomer.getCustomerId()));
+        }
+    }
 }
