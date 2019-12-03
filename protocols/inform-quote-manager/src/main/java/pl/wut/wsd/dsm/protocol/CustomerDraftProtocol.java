@@ -12,22 +12,23 @@ import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 import java.util.Objects;
 
 @Accessors(fluent = true)
-public class DraftProtocol extends Protocol {
+public class CustomerDraftProtocol extends Protocol {
 
     @Getter
     private final ProtocolStep sendClientOffer;
 
     @Getter
+    /** Send client decision to quote manager. */
     private final ProtocolStep sendClientDecision;
 
     @Getter
     private final ProtocolStep acceptClientDecision;
 
-    public static DraftProtocol forCustomer(final Customer customer) {
-        return new DraftProtocol(Objects.requireNonNull(customer));
+    public static CustomerDraftProtocol forCustomer(final Customer customer) {
+        return new CustomerDraftProtocol(Objects.requireNonNull(customer));
     }
 
-    private DraftProtocol(final Customer customer) {
+    private CustomerDraftProtocol(final Customer customer) {
         final ServiceDescriptionFactory factory = new ServiceDescriptionFactory();
 
         sendClientOffer = ProtocolStep.builder()

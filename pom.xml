@@ -109,7 +109,7 @@
             </dependency>
             <dependency>
                 <groupId>pl.wut.wsd.dsm</groupId>
-                <artifactId>auction-ontology</artifactId>
+                <artifactId>customer-draft-ontology</artifactId>
                 <version>${auction.ontology.version}</version>
             </dependency>
 

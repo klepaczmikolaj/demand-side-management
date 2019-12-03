@@ -9,16 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>draft-protocol</artifactId>
+    <artifactId>system-draft-protocol</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>
             <artifactId>protocol-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.wut.wsd.dsm</groupId>
-            <artifactId>customer-draft-ontology</artifactId>
         </dependency>
     </dependencies>
 

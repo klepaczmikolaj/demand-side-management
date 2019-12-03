@@ -13,9 +13,19 @@
     <dependencies>
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>
-            <artifactId>auction-ontology</artifactId>
+            <artifactId>customer-draft-ontology</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>draft-protocol</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>infrastructure-messaging</artifactId>
         </dependency>
     </dependencies>
 

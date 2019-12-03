@@ -1,11 +1,42 @@
 package pl.wut.wsd.dsm.agent.quote_manager;
 
 import jade.core.Agent;
-import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import lombok.extern.slf4j.Slf4j;
+import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
+import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
+import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
+@Slf4j
 public class QuoteAgent extends Agent {
 
-    public void processClientDecision(final CustomerObligation customerObligation) {
-        //TODO, process client offer
+    private final CustomerDraftProtocol customerDraftProtocol = CustomerDraftProtocol.forCustomer(new Customer(0L));
+    private final ServiceDiscovery<QuoteAgent> serviceDiscovery = new ServiceDiscovery<>(this);
+
+    @Override
+    protected void setup() {
+        this.addBehaviour(new MessageHandler(this,
+                MessageSpecification.of(customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse))
+        );
+        registerToWhitepages();
+    }
+
+    private void processClientResponse(final ACLMessage message) {
+        log.info("Processing client response");
+    }
+
+    private void registerToWhitepages() {
+        final DFAgentDescription dfAgentDescription = new DFAgentDescription();
+        dfAgentDescription.addServices(customerDraftProtocol.sendClientDecision().getTargetService());
+        try {
+            DFService.register(this, dfAgentDescription);
+        } catch (final FIPAException e) {
+            log.error("Could not register to whitepages", e);
+        }
     }
 }

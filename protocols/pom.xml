@@ -15,6 +15,7 @@
         <module>inform-quote-manager</module>
         <module>commons</module>
         <module>customer-trust</module>
+        <module>system-draft</module>
     </modules>
 
     <dependencies>
