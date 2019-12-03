@@ -8,41 +8,45 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.infrastructure.codec.Codec;
+import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.function.Result;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
+import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
 @Slf4j
 public class CustomerHandlerAgent extends Agent {
 
     private Customer customer;
-    private CustomerDraftProtocol customerDraftProtocol;
+    private Codec codec;
+    private CustomerDraftProtocol customerDraftProtocol = new CustomerDraftProtocol();
     private final ServiceDiscovery<CustomerHandlerAgent> serviceDiscovery = new ServiceDiscovery<>(this);
 
     @Override
     protected void setup() {
         final CustomerHandlerDependencies dependencies = (CustomerHandlerDependencies) getArguments()[0];
         this.customer = dependencies.getCustomer();
-        this.customerDraftProtocol = CustomerDraftProtocol.forCustomer(customer);
         this.addBehaviour(
-                new MessageHandler(this, MessageSpecification.of(customerDraftProtocol.sendClientOffer().toMessageTemplate(), this::handleCustomerOffer))
-        );
-        this.addBehaviour(
-                new MessageHandler(this, MessageSpecification.of(customerDraftProtocol.acceptClientDecision().toMessageTemplate(), this::handleAcceptance))
+                new MessageHandler(this,
+                        MessageSpecification.of(customerDraftProtocol.sendClientOffer().toMessageTemplate(), this::handleCustomerOffer),
+                        MessageSpecification.of(customerDraftProtocol.acceptClientDecision().toMessageTemplate(), this::handleAcceptance))
         );
         registerToWhitepages();
     }
 
     private void handleAcceptance(final ACLMessage aclMessage) {
         log.info("User offer accepted: {}", aclMessage.getContent());
-        customerDraftProtocol.acceptClientDecision().getTargetService();
+        customerDraftProtocol.acceptClientDecision().serviceDescription(customer);
     }
 
     private void registerToWhitepages() {
         final DFAgentDescription description = new DFAgentDescription();
         description.setName(this.getAID());
-        description.addServices(customerDraftProtocol.sendClientOffer().getTargetService());
+        description.addServices(customerDraftProtocol.sendClientOffer().serviceDescription(customer));
+        description.addServices(customerDraftProtocol.acceptClientDecision().serviceDescription(customer));
 
         try {
             DFService.register(this, description);
@@ -53,7 +57,14 @@ public class CustomerHandlerAgent extends Agent {
 
     private void handleCustomerOffer(final ACLMessage aclMessage) {
         log.info("Received customer offer: ", aclMessage.getContent());
-        //TODO, send offer to customer and wait for response.
+        final Class<CustomerOffer> messageClass = customerDraftProtocol.sendClientOffer().getMessageClass();
+        final Result<CustomerOffer, DecodingError> decode = codec.decode(aclMessage.getContent(), messageClass);
+
+        if (decode.isError()) {
+            log.error("Error occured: " + decode.error().getMessage());
+        } else {
+
+        }
     }
 
 

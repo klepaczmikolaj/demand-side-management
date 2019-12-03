@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-public class TargetedStep<T extends Protocol> extends ProtocolStep<T> {
+public class TargetedStep<T extends Protocol, C> extends ProtocolStep<T, C> {
 
     @Getter
     private final ServiceDescription targetService;
@@ -14,7 +14,7 @@ public class TargetedStep<T extends Protocol> extends ProtocolStep<T> {
     protected TargetedStep(@NonNull final String stepName,
                            @NonNull final int performative,
                            @NonNull final boolean required,
-                           @NonNull final Class<?> messageClass,
+                           @NonNull final Class<C> messageClass,
                            @NonNull final T protocol,
                            @NonNull final ServiceDescription targetService) {
         super(stepName, performative, required, messageClass, protocol);

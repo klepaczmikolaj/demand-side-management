@@ -33,7 +33,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         sendClientOffer = new SendClientOffer(this);
 
-        sendClientDecision = TargetedStep.builder()
+        sendClientDecision = TargetedStep.<CustomerDraftProtocol, CustomerObligation>builder()
                 .stepName("Send client decision")
                 .performative(ACLMessage.PROPOSE)
                 .required(false)
@@ -45,7 +45,7 @@ public class CustomerDraftProtocol extends Protocol {
         acceptClientDecision = new AcceptClientDecision(this);
     }
 
-    public static class SendClientOffer extends ProtocolStep<CustomerDraftProtocol> {
+    public static class SendClientOffer extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
         private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
         private SendClientOffer(final @NonNull CustomerDraftProtocol protocol) {
@@ -58,7 +58,7 @@ public class CustomerDraftProtocol extends Protocol {
         }
     }
 
-    public static class AcceptClientDecision extends ProtocolStep<CustomerDraftProtocol> {
+    public static class AcceptClientDecision extends ProtocolStep<CustomerDraftProtocol, CustomerObligation> {
         private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
         protected AcceptClientDecision(final @NonNull CustomerDraftProtocol protocol) {

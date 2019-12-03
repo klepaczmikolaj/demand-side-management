@@ -8,7 +8,7 @@ import lombok.NonNull;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class ProtocolStep<T extends Protocol> {
+public class ProtocolStep<T extends Protocol, C> {
 
     @Getter
     private final String stepName;
@@ -21,7 +21,7 @@ public class ProtocolStep<T extends Protocol> {
 
 
     @Getter
-    private final Class<?> messageClass;
+    private final Class<C> messageClass;
 
     private final T protocol;
 
@@ -29,7 +29,7 @@ public class ProtocolStep<T extends Protocol> {
     protected ProtocolStep(@NonNull final String stepName,
                            @NonNull final int performative,
                            @NonNull final boolean required,
-                           @NonNull final Class<?> messageClass,
+                           @NonNull final Class<C> messageClass,
                            @NonNull final T protocol) {
         this.stepName = Objects.requireNonNull(stepName);
         this.performative = performative;
