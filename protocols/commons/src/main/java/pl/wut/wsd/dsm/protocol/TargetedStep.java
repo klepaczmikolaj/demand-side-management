@@ -10,7 +10,7 @@ public class TargetedStep<T extends Protocol, C> extends ProtocolStep<T, C> {
     @Getter
     private final ServiceDescription targetService;
 
-    @Builder
+    @Builder(builderMethodName = "targetedBuilder")
     protected TargetedStep(@NonNull final String stepName,
                            @NonNull final int performative,
                            @NonNull final boolean required,

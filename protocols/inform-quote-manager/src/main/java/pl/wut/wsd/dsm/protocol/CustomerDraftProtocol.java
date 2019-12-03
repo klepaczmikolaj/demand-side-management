@@ -33,7 +33,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         sendClientOffer = new SendClientOffer(this);
 
-        sendClientDecision = TargetedStep.<CustomerDraftProtocol, CustomerObligation>builder()
+        sendClientDecision = TargetedStep.<CustomerDraftProtocol, CustomerObligation>targetedBuilder()
                 .stepName("Send client decision")
                 .performative(ACLMessage.PROPOSE)
                 .required(false)

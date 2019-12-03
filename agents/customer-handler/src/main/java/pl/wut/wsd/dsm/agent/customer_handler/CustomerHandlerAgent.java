@@ -29,6 +29,7 @@ public class CustomerHandlerAgent extends Agent {
     protected void setup() {
         final CustomerHandlerDependencies dependencies = (CustomerHandlerDependencies) getArguments()[0];
         this.customer = dependencies.getCustomer();
+        this.codec = dependencies.getCodec();
         this.addBehaviour(
                 new MessageHandler(this,
                         MessageSpecification.of(customerDraftProtocol.sendClientOffer().toMessageTemplate(), this::handleCustomerOffer),
@@ -63,6 +64,8 @@ public class CustomerHandlerAgent extends Agent {
         if (decode.isError()) {
             log.error("Error occured: " + decode.error().getMessage());
         } else {
+            final CustomerOffer customerOffer = decode.result();
+            // forward offer to customer
 
         }
     }

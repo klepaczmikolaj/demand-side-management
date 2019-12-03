@@ -16,6 +16,11 @@
             <groupId>pl.wut.wsd.dsm</groupId>
             <artifactId>protocol-commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>network-ontology</artifactId>
+        </dependency>
     </dependencies>
+
 
 </project>

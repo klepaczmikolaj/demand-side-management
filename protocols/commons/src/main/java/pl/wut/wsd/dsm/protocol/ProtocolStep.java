@@ -1,5 +1,6 @@
 package pl.wut.wsd.dsm.protocol;
 
+import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,6 @@ public class ProtocolStep<T extends Protocol, C> {
 
     @Getter
     private final boolean required;
-
 
     @Getter
     private final Class<C> messageClass;
@@ -45,6 +45,14 @@ public class ProtocolStep<T extends Protocol, C> {
                 MessageTemplate.MatchProtocol(protocol.getName())
         )
                 .reduce(MessageTemplate.MatchAll(), MessageTemplate::and);
+    }
+
+    public ACLMessage templatedMessage() {
+        final ACLMessage message = new ACLMessage(this.performative);
+        message.setProtocol(this.protocol.getName());
+        message.setOntology(messageClass.getCanonicalName());
+
+        return message;
     }
 
 

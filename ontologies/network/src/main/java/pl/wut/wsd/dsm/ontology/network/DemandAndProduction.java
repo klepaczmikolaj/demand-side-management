@@ -1,11 +1,13 @@
 package pl.wut.wsd.dsm.ontology.network;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.math.BigInteger;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DemandAndProduction {
-    private BigInteger wattsDemand;
-    private BigInteger wattsProduction;
+    private double wattsDemand;
+    private double wattsProduction;
 }

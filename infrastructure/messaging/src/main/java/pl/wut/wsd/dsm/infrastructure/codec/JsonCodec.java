@@ -19,4 +19,9 @@ class JsonCodec implements Codec {
     public <R> String encode(final R object) {
         return gson.toJson(object);
     }
+
+    @Override
+    public String language() {
+        return "json";
+    }
 }
