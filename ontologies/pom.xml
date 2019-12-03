@@ -13,7 +13,7 @@
         <module>trust</module>
         <module>network</module>
         <module>customer</module>
-        <module>customer-draft-ontology</module>
+        <module>customer-draft</module>
         <module>device</module>
     </modules>
 
