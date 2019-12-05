@@ -12,7 +12,6 @@
     <artifactId>agents</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>customer</module>
         <module>network-advisor</module>
         <module>customer-handler</module>
         <module>trust-factor</module>
