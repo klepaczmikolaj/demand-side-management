@@ -39,6 +39,7 @@ public class NetworkAgent extends Agent {
         this.weatherForecast = dependencies.weatherAdapter().getWeatherForecast();
         this.productionProfile = dependencies.electricityProductionProfileCalculator().calculate(weatherForecast);
         this.demandProfile = dependencies.electricityDemandProfileCalculator().calculate(weatherForecast);
+
         /* Refresh weather behaviour */
         addBehaviour(new TickerBehaviour(this, dependencies.weatherRefreshDuration().toMillis()) {
             @Override
@@ -72,8 +73,6 @@ public class NetworkAgent extends Agent {
 
         /* Inform quote manager of inbalancement */
         addBehaviour(new TickerBehaviour(this, dependencies.inbalancementCheckRefreshFrequency().toMillis()) {
-            private static final int secondsInMinute = 60;
-
             @Override
             protected void onTick() {
                 final DemandAndProduction demandAndProduction = calculateDemandAndProduction();
