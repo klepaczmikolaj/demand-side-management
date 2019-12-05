@@ -17,13 +17,14 @@
         <module>trust-factor</module>
         <module>quote-manager</module>
         <module>demand-balance</module>
+        <module>gateway</module>
+        <module>customer-agent</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>com.tilab.jade</groupId>
             <artifactId>jade</artifactId>
-            <version>${jade.version}</version>
         </dependency>
         <dependency>
             <groupId>org.spockframework</groupId>

@@ -35,7 +35,6 @@
         <protocol.commons.version>1.0-SNAPSHOT</protocol.commons.version>
         <draft.protocol.version>1.0-SNAPSHOT</draft.protocol.version>
         <system.draft.protocol.version>1.0-SNAPSHOT</system.draft.protocol.version>
-
         <mysql.connector.version>8.0.18</mysql.connector.version>
         <maven.compiler.version>3.8.1</maven.compiler.version>
     </properties>

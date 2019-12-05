@@ -3,6 +3,7 @@ package pl.wut.wsd.dsm.agent.network_advisor;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +22,14 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
 public class NetworkAgent extends Agent {
 
     private NetworkAgentDependencies dependencies;
-    private final ServiceDiscovery<NetworkAgent> serviceDiscovery = new ServiceDiscovery<>(this);
+    private final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
     private final SystemDraftProtocol systemDraftProtocol = new SystemDraftProtocol();
     private WeatherForecast weatherForecast;
     private ElectricityProductionProfile productionProfile;
@@ -84,7 +86,8 @@ public class NetworkAgent extends Agent {
                             .expectedDemandAndProduction(demandAndProduction)
                             .build();
 
-                    final Result<List<AID>, FIPAException> services = serviceDiscovery.findServices(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getTargetService());
+                    final Result<List<AID>, FIPAException> services = serviceDiscovery.findServices(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getTargetService())
+                            .mapResult(l -> l.stream().map(DFAgentDescription::getName).collect(Collectors.toList()));
 
                     if (services.isError()) {
                         log.error("Could not find quote service!", services.error());
@@ -134,7 +137,6 @@ public class NetworkAgent extends Agent {
         });
 
     }
-
 
 }
 

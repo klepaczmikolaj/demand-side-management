@@ -23,7 +23,7 @@ public class CustomerHandlerAgent extends Agent {
     private Customer customer;
     private Codec codec;
     private CustomerDraftProtocol customerDraftProtocol = new CustomerDraftProtocol();
-    private final ServiceDiscovery<CustomerHandlerAgent> serviceDiscovery = new ServiceDiscovery<>(this);
+    private final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
 
     @Override
     protected void setup() {
@@ -37,6 +37,7 @@ public class CustomerHandlerAgent extends Agent {
         );
         registerToWhitepages();
     }
+
 
     private void handleAcceptance(final ACLMessage aclMessage) {
         log.info("User offer accepted: {}", aclMessage.getContent());

@@ -22,7 +22,7 @@ public class CustomerDraftProtocol extends Protocol {
 
     @Getter
     /** Send client decision to quote manager. */
-    private final ProtocolStep sendClientDecision;
+    private final TargetedStep sendClientDecision;
 
     @Getter
     private final AcceptClientDecision acceptClientDecision;

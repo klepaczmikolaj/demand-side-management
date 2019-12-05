@@ -6,7 +6,6 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
-import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
@@ -15,8 +14,8 @@ import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 @Slf4j
 public class QuoteAgent extends Agent {
 
-    private final CustomerDraftProtocol customerDraftProtocol = CustomerDraftProtocol.forCustomer(new Customer(0L));
-    private final ServiceDiscovery<QuoteAgent> serviceDiscovery = new ServiceDiscovery<>(this);
+    private final CustomerDraftProtocol customerDraftProtocol = new CustomerDraftProtocol();
+    private final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
 
     @Override
     protected void setup() {

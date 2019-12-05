@@ -1,6 +1,5 @@
 package pl.wut.wsd.dsm.infrastructure.discovery;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -14,21 +13,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class ServiceDiscovery<T extends Agent> {
+public class ServiceDiscovery {
 
-    private final T agent;
+    private final Agent agent;
 
-    public Result<List<AID>, FIPAException> findServices(final ServiceDescription serviceDescription) {
+    public Result<List<DFAgentDescription>, FIPAException> findServices(final ServiceDescription serviceDescription) {
         final DFAgentDescription dfAgentDescription = new DFAgentDescription();
         dfAgentDescription.addServices(serviceDescription);
 
         return callYellowPagesService(dfAgentDescription);
     }
 
-    private Result<List<AID>, FIPAException> callYellowPagesService(final DFAgentDescription dfAgentDescription) {
+    private Result<List<DFAgentDescription>, FIPAException> callYellowPagesService(final DFAgentDescription dfAgentDescription) {
         try {
-            final List<AID> agentIds = Arrays.stream(DFService.search(agent, dfAgentDescription))
-                    .map(DFAgentDescription::getName)
+            final List<DFAgentDescription> agentIds = Arrays.stream(DFService.search(agent, dfAgentDescription))
                     .collect(Collectors.toList());
             return Result.ok(agentIds);
 

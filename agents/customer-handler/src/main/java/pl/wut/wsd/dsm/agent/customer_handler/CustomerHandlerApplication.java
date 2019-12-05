@@ -11,6 +11,7 @@ import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_handler.infrastructure.hibernate.HibernateTemplate;
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerObligationRepository;
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.HibernateCustomerObligationRepository;
+import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class CustomerHandlerApplication {
         final HibernateTemplate template = new HibernateTemplate(dbUrl, dbUser, dbPass);
         final CustomerObligationRepository repository = new HibernateCustomerObligationRepository(template);
 
-        final CustomerHandlerDependencies customerHandlerDependencies = new CustomerHandlerDependencies(new Customer(customerId), repository);
+        final CustomerHandlerDependencies customerHandlerDependencies = new CustomerHandlerDependencies(new Customer(customerId), repository, Codec.json());
 
         final AgentContainer customerAgentContainer = createAgentContainer();
 
