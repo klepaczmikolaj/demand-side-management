@@ -1,4 +1,4 @@
-package pl.wut.wsd.dsm.infrastructure.function;
+package pl.wut.wsd.dsm.infrastructure.common.function;
 
 import lombok.AccessLevel;
 import lombok.Getter;

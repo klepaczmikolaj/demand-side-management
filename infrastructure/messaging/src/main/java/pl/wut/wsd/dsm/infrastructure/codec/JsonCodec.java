@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import pl.wut.wsd.dsm.infrastructure.function.Result;
+import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class JsonCodec implements Codec {

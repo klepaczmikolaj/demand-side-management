@@ -6,7 +6,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import lombok.RequiredArgsConstructor;
-import pl.wut.wsd.dsm.infrastructure.function.Result;
+import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
 import java.util.Arrays;
 import java.util.List;

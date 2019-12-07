@@ -8,8 +8,8 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.wsd.dsm.agent.infrastructure.JadeIteratorUtil;
+import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
-import pl.wut.wsd.dsm.infrastructure.function.Result;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -9,14 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>infrastructure-messaging</artifactId>
+    <artifactId>properties</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.tilab.jade</groupId>
-            <artifactId>jade</artifactId>
-            <version>${jade.version}</version>
-            <scope>provided</scope>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>infrastructure-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -25,14 +23,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.wut.wsd.dsm</groupId>
-            <artifactId>infrastructure-common</artifactId>
         </dependency>
     </dependencies>
 

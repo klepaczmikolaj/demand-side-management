@@ -1,7 +1,7 @@
 package pl.wut.wsd.dsm.infrastructure.codec;
 
 
-import pl.wut.wsd.dsm.infrastructure.function.Result;
+import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
 public interface Codec {
 
