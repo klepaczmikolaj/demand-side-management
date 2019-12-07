@@ -19,10 +19,10 @@ public class GatewayAgentApplication {
 
 
     public static void main(final String[] args) throws StaleProxyException {
-        final Javalin app = Javalin.create(JavalinConfig::enableCorsForAllOrigins).start(8080);
+        final Javalin api = Javalin.create(JavalinConfig::enableCorsForAllOrigins).start(8080);
         final GatewayAgentDelegate delegate = new GatewayAgentDelegate();
 
-        app.get("/", ctx -> {
+        api.get("/", ctx -> {
             final Long customerId = ctx.queryParam("customerId", Long.class).getValue();
             if (customerId == null) {
                 ctx.result("Please provide customerId");
