@@ -7,16 +7,19 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommandLineConfiguration implements AgentConfiguration {
+public class CommandLineConfiguration extends AgentConfiguration {
 
     private final CommandLine commandLine;
     private final Options options;
@@ -34,10 +37,15 @@ public class CommandLineConfiguration implements AgentConfiguration {
     }
 
     @Override
-    public <R> Optional<R> getProperty(final String key, final Function<String, R> parser) {
+    public Optional<String> getProperty(final String key) {
         final String optionValue = commandLine.getOptionValue(key);
 
-        return Optional.ofNullable(optionValue).map(parser);
+        return Optional.ofNullable(optionValue);
+    }
+
+    @Override
+    protected Map<String, String> toPropertiesMap() {
+        return Arrays.stream(commandLine.getOptions()).collect(Collectors.toMap(Option::getOpt, Option::getValue));
     }
 
     public void printUsageInformation(final String applicationName) {

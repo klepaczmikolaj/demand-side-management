@@ -31,4 +31,24 @@ class CommandLineConfigurationTest extends Specification {
         commandLine    | expectations
         '-x d -id 123' | ['x': 'd', 'customerId': '123']
     }
+
+    def 'Should properly parse options to option map'() {
+        given:
+        final Options options = new Options()
+        options.addOption('v', true, 'prints verbose output')
+        options.addOption('x', true, 'prints errors')
+        options.addRequiredOption('id', 'customerId', true, 'related agent customer id')
+        new HelpFormatter().printHelp('test', options)
+
+        when:
+        final configResult = CommandLineConfiguration.of(options, commandLine.split('\\s'))
+
+        then:
+        configResult.isValid()
+        configResult.result().toPropertiesMap() == expectations
+
+        where:
+        commandLine    | expectations
+        '-x d -id 123' | ['x': 'd', 'id': '123']
+    }
 }

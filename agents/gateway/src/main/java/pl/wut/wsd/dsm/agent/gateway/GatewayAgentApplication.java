@@ -34,7 +34,7 @@ public class GatewayAgentApplication {
             final Optional<URL> customerApiLocation = delegate.getCustomerApiLocation(customerId);
 
             if (customerApiLocation.isPresent()) {
-                ctx.result(customerApiLocation.toString());
+                ctx.result(customerApiLocation.get().toString());
             } else {
                 ctx.status(HttpStatus.NOT_FOUND_404);
                 ctx.result("Api for customer: " + customerId + " not found");

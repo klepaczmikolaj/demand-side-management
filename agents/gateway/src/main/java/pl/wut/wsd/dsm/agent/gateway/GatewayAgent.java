@@ -23,6 +23,8 @@ import java.util.function.Predicate;
 @Slf4j
 public class GatewayAgent extends Agent {
 
+    private static final String customerApiAddress = "customerApiAddress";
+
     private List<DFAgentDescription> customerAgents = new ArrayList<>();
     private final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
     private GatewayAgentDelegate delegate;
@@ -58,7 +60,7 @@ public class GatewayAgent extends Agent {
                 .flatMap(Collection::stream)
                 .map(JadeIteratorUtil::getProperties)
                 .flatMap(Collection::stream)
-                .filter(p -> p.getName().equals("customer-api-url"))
+                .filter(p -> p.getName().equals(customerApiAddress))
                 .map(Property::getValue)
                 .map(Object::toString)
                 .map(this::toUrl)

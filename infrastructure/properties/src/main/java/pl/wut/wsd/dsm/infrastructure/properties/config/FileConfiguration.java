@@ -8,12 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class FileConfiguration implements AgentConfiguration {
+public class FileConfiguration extends AgentConfiguration {
 
     private final Properties properties;
 
@@ -33,8 +35,13 @@ public class FileConfiguration implements AgentConfiguration {
     }
 
     @Override
-    public <R> Optional<R> getProperty(final String key, final Function<String, R> parser) {
-        return Optional.ofNullable(properties.getProperty(key)).map(parser);
+    public Optional<String> getProperty(final String key) {
+        return Optional.ofNullable(properties.getProperty(key));
+    }
+
+    @Override
+    protected Map<String, String> toPropertiesMap() {
+        return properties.stringPropertyNames().stream().collect(Collectors.toMap(Function.identity(), properties::getProperty));
     }
 
 }

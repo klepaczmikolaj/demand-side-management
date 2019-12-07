@@ -37,6 +37,20 @@ public class Result<L, R> {
         }
     }
 
+    public L throwingGet(final Function<R, ? extends Exception> mapper) throws Exception {
+        if (!isValid()) {
+            throw mapper.apply(error);
+        }
+        return result;
+    }
+
+    public L throwingGetRuntime(final Function<R, ? extends RuntimeException> mapper) {
+        if (!isValid()) {
+            throw mapper.apply(error);
+        }
+        return result;
+    }
+
     public <X> Result<X, R> mapResult(final Function<L, X> mapper) {
         return this.isValid() ? Result.ok(mapper.apply(this.result)) : Result.error(this.error);
     }
