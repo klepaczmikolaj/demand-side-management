@@ -5,4 +5,8 @@ public class MissingConfigEntryException extends RuntimeException {
     public MissingConfigEntryException(final String argumentName, final String format) {
         super(String.format("Missing config entry %s of %s format", argumentName, format));
     }
+
+    public MissingConfigEntryException(final String argumentName) {
+        super(String.format("Missing config entry %s", argumentName));
+    }
 }

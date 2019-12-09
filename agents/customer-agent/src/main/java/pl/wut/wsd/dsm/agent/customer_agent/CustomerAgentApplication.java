@@ -2,11 +2,7 @@ package pl.wut.wsd.dsm.agent.customer_agent;
 
 import io.javalin.Javalin;
 import io.javalin.core.JavalinConfig;
-import jade.core.Profile;
-import jade.core.ProfileImpl;
-import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
-import jade.wrapper.AgentController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.Options;
 import pl.wut.dsm.ontology.customer.Customer;
@@ -15,6 +11,8 @@ import pl.wut.wsd.dsm.infrastructure.properties.config.AgentConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.CommandLineConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.FileConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.MissingConfigEntryException;
+import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupInfoImpl;
+import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
 
 import java.nio.file.Paths;
 
@@ -25,6 +23,8 @@ public class CustomerAgentApplication {
     private static final String mainContainerOption = "container";
     private static final String mainContainerPortOption = "port";
     private static final String customerIdOption = "cid";
+
+    private static final AgentStartupManager startupManager = new AgentStartupManager();
 
     public static void main(final String[] args) throws Exception {
         final Options options = new Options();
@@ -50,7 +50,7 @@ public class CustomerAgentApplication {
                 .orElseThrow(() -> new MissingConfigEntryException(customerIdOption, "customer id (long)"));
 
 
-        final AgentContainer customerAgentContainer = createAgentContainer(hostname, containerPort, customerID);
+        final AgentContainer container = createAgentContainer(hostname, containerPort, customerID);
 
         final int javalinPort = InetUtils.getFreePort();
         final Javalin javalin = startJavalin(javalinPort);
@@ -61,11 +61,7 @@ public class CustomerAgentApplication {
                 .javalinPort(javalinPort)
                 .build();
 
-        log.info("Starting customer agent for customer {}", dependencies.getCustomer().getCustomerId());
-
-        final AgentController agentController = customerAgentContainer.createNewAgent("customer-agent" + customerID, CustomerAgent.class.getCanonicalName(), new Object[]{dependencies});
-        agentController.start();
-
+        startupManager.startAgent(container, CustomerAgent.class, "customer-agent" + customerID, dependencies);
     }
 
     private static Javalin startJavalin(final int freePort) {
@@ -78,14 +74,12 @@ public class CustomerAgentApplication {
     }
 
     private static AgentContainer createAgentContainer(final String mainContainerHost, final int port, final Long customerId) {
-        final Runtime runtime = Runtime.instance();
-        final Profile profile = new ProfileImpl();
-        profile.setParameter(Profile.PLATFORM_ID, "wsd-dsm");
-        profile.setParameter(Profile.CONTAINER_NAME, "customer-container" + customerId);
-        profile.setParameter(Profile.MAIN_HOST, mainContainerHost);
-        profile.setParameter(Profile.MAIN_PORT, Integer.toString(port));
-
-        return runtime.createAgentContainer(profile);
+        return startupManager.startChildContainer(AgentStartupInfoImpl.builder()
+                .platformId("wsd-dsm")
+                .containerName("customer-container" + customerId)
+                .mainContainerHost(mainContainerHost)
+                .mainContainerPort(port)
+                .build());
     }
 
 }

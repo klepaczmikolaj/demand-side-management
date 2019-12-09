@@ -25,9 +25,12 @@
         <logback.version>1.2.3</logback.version>
         <okhttp.version>4.2.2</okhttp.version>
         <hibernate.version>5.4.9.Final</hibernate.version>
+        <!--++++++++++++++++++++Infrastructure++++++++++++++++++-->
         <infrastructure.messaging.version>1.0-SNAPSHOT</infrastructure.messaging.version>
         <infrastructure.common.version>1.0-SNAPSHOT</infrastructure.common.version>
         <infrastructure.properties.version>1.0-SNAPSHOT</infrastructure.properties.version>
+        <infrastructure.persistence.version>1.0-SNAPSHOT</infrastructure.persistence.version>
+        <infrastructure.startup.version>1.0-SNAPSHOT</infrastructure.startup.version>
         <!-- ++++++++++++++++++++Ontologies++++++++++++++++++++-->
         <trust.ontology.version>1.0-SNAPSHOT</trust.ontology.version>
         <customer.ontology.verion>1.0-SNAPSHOT</customer.ontology.verion>
@@ -152,6 +155,16 @@
                 <groupId>pl.wut.wsd.dsm</groupId>
                 <artifactId>properties</artifactId>
                 <version>${infrastructure.properties.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>infrastructure-persistence</artifactId>
+                <version>${infrastructure.persistence.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>infrastructure-startup</artifactId>
+                <version>${infrastructure.startup.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

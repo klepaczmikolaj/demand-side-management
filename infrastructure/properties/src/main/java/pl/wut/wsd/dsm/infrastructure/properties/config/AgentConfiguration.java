@@ -11,6 +11,21 @@ public abstract class AgentConfiguration {
         return getProperty(key).map(parser);
     }
 
+    /**
+     * @throws MissingConfigEntryException on missing entry
+     */
+    public <R> R getThrowing(final String key, final Function<String, R> parser) throws MissingConfigEntryException {
+        return getProperty(key).map(parser).orElseThrow(() -> new MissingConfigEntryException(key));
+    }
+
+    /**
+     * @throws MissingConfigEntryException on missing entry
+     */
+    public String getThrowing(final String key) throws MissingConfigEntryException {
+        return getProperty(key).orElseThrow(() -> new MissingConfigEntryException(key));
+    }
+
+
     public abstract Optional<String> getProperty(String key);
 
     public AgentConfiguration merge(final AgentConfiguration otherSource, final AgentConfigurationPriority priority) {
@@ -28,7 +43,7 @@ public abstract class AgentConfiguration {
 
     protected abstract Map<String, String> toPropertiesMap();
 
-    enum AgentConfigurationPriority {
+    public enum AgentConfigurationPriority {
         THIS, OTHER
     }
 }

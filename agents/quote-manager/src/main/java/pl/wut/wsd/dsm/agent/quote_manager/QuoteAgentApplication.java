@@ -1,12 +1,10 @@
 package pl.wut.wsd.dsm.agent.quote_manager;
 
-import jade.core.Profile;
-import jade.core.ProfileImpl;
-import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
-import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import lombok.extern.slf4j.Slf4j;
+import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupInfoImpl;
+import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
 
 @Slf4j
 public class QuoteAgentApplication {
@@ -15,24 +13,19 @@ public class QuoteAgentApplication {
     private static final String mainContainerHost = "localhost";
     private static final int mainContainerPort = 1099;
 
+    private static final AgentStartupManager agentStartupManager = new AgentStartupManager();
+
     public static void main(final String[] args) throws StaleProxyException {
         final AgentContainer agentContainer = createAgentContainer();
-
-        log.info("Starting quote agent application");
-
-        final AgentController agentController = agentContainer.createNewAgent("quote-manager", QuoteAgent.class.getCanonicalName(), new Object[]{});
-
-        agentController.start();
+        agentStartupManager.startAgent(agentContainer, QuoteAgent.class, "quote-manager", null);
     }
 
     private static AgentContainer createAgentContainer() {
-        final Runtime runtime = Runtime.instance();
-        final Profile profile = new ProfileImpl();
-        profile.setParameter(Profile.PLATFORM_ID, "wsd-dsm");
-        profile.setParameter(Profile.CONTAINER_NAME, "quote-manager-container");
-        profile.setParameter(Profile.MAIN_HOST, mainContainerHost);
-        profile.setParameter(Profile.MAIN_PORT, Integer.toString(mainContainerPort));
-
-        return runtime.createAgentContainer(profile);
+        return agentStartupManager.startChildContainer(AgentStartupInfoImpl.builder()
+                .platformId("wsd-dsm")
+                .containerName("quote-container")
+                .mainContainerHost(mainContainerHost)
+                .mainContainerPort(mainContainerPort)
+                .build());
     }
 }

@@ -45,6 +45,10 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>infrastructure-startup</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

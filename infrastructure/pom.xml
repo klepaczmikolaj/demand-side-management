@@ -15,6 +15,8 @@
         <module>messaging</module>
         <module>properties</module>
         <module>infrastructure-common</module>
+        <module>peristence</module>
+        <module>startup</module>
     </modules>
 
     <dependencies>

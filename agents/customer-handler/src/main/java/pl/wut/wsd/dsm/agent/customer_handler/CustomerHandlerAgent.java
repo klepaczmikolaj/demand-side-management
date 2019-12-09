@@ -57,6 +57,9 @@ public class CustomerHandlerAgent extends Agent {
         }
     }
 
+    /**
+     * Receives customer offer from quote manager and passes it to customer handler.
+     */
     private void handleCustomerOffer(final ACLMessage aclMessage) {
         log.info("Received customer offer: ", aclMessage.getContent());
         final Class<CustomerOffer> messageClass = customerDraftProtocol.sendClientOffer().getMessageClass();

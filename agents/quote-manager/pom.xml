@@ -25,6 +25,11 @@
 
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>system-draft-protocol</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
             <artifactId>infrastructure-messaging</artifactId>
         </dependency>
     </dependencies>
