@@ -16,16 +16,36 @@ public class InterpolatedElectricityProductionProfile implements ElectricityProd
     private final Map<ZonedDateTime, BigInteger> productionPoints;
 
     @Override
-    public BigInteger getProductionInWatts(ZonedDateTime at) {
-        Set<ZonedDateTime> dates = productionPoints.keySet();
-        List<ZonedDateTime> sortedDates = dates.stream().sorted().collect(Collectors.toList());
-        ListIterator<ZonedDateTime> iterator = sortedDates.listIterator();
-        
-        while(iterator.hasNext() && )
-        for (int i = 0; i < sortedDates.size(); i++) {
-            ZonedDateTime date = sortedDates.get(i);
-            if
-        }
+    public BigInteger getProductionInWatts(final ZonedDateTime at) {
+        final Set<ZonedDateTime> dates = productionPoints.keySet();
+        final List<ZonedDateTime> sortedDates = dates.stream().sorted().collect(Collectors.toList());
+
+        final Dates closestDates = findClosesDates(at, sortedDates);
+
+
         return null;
     }
+
+    private Dates findClosesDates(final ZonedDateTime at, final List<ZonedDateTime> sortedDates) {
+        final ListIterator<ZonedDateTime> iterator = sortedDates.listIterator();
+
+        final ZonedDateTime next = iterator.next();
+        while (iterator.hasNext()) {
+            if (next.isAfter(at)) {
+                if (iterator.hasPrevious()) {
+                    return Dates.of(iterator.previous(), next);
+                } else {
+                    return Dates.of(next, iterator.next());
+                }
+            }
+        }
+        return null; //TODO, ostatnia i przedostatnia
+    }
+
+    @RequiredArgsConstructor(staticName = "of")
+    private static class Dates {
+        private final ZonedDateTime closestBefore;
+        private final ZonedDateTime closestAfter;
+    }
 }
+
