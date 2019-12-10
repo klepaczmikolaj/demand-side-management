@@ -17,7 +17,7 @@ public class WeatherForecastEntry {
 
     @SerializedName("dt_txt")
     @JsonAdapter(WeatherApiJsonDateAdapter.class)
-    private ZonedDateTime date;
+    private ZonedDateTime measurementDate;
 
     @SerializedName("clouds")
     private Cloudiness cloudiness;
