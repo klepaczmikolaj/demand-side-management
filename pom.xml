@@ -40,6 +40,7 @@
         <protocol.commons.version>1.0-SNAPSHOT</protocol.commons.version>
         <draft.protocol.version>1.0-SNAPSHOT</draft.protocol.version>
         <system.draft.protocol.version>1.0-SNAPSHOT</system.draft.protocol.version>
+        <customer.trust.protocol.version>1.0-SNAPSHOT</customer.trust.protocol.version>
         <mysql.connector.version>8.0.18</mysql.connector.version>
         <maven.compiler.version>3.8.1</maven.compiler.version>
         <commons.cli.version>1.4</commons.cli.version>
@@ -140,6 +141,11 @@
                 <groupId>pl.wut.wsd.dsm</groupId>
                 <artifactId>system-draft-protocol</artifactId>
                 <version>${system.draft.protocol.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>pl.wut.wsd.dsm</groupId>
+                <artifactId>customer-trust</artifactId>
+                <version>${customer.trust.protocol.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>

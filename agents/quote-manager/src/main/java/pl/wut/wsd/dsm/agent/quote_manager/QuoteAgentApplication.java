@@ -3,6 +3,7 @@ package pl.wut.wsd.dsm.agent.quote_manager;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.StaleProxyException;
 import lombok.extern.slf4j.Slf4j;
+import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupInfoImpl;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
 
@@ -17,7 +18,9 @@ public class QuoteAgentApplication {
 
     public static void main(final String[] args) throws StaleProxyException {
         final AgentContainer agentContainer = createAgentContainer();
-        agentStartupManager.startAgent(agentContainer, QuoteAgent.class, "quote-manager", null);
+        final QuoteAgentDependencies dependencies = QuoteAgentDependencies.builder().codec(Codec.json()).build();
+
+        agentStartupManager.startAgent(agentContainer, QuoteAgent.class, "quote-manager", dependencies);
     }
 
     private static AgentContainer createAgentContainer() {

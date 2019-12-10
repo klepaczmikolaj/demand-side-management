@@ -62,6 +62,7 @@ public class NetworkAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, dependencies.productionProfileRefreshFrequency().toMillis()) {
             @Override
             protected void onTick() {
+                log.info("Refreshing production profile");
                 productionProfile = dependencies.electricityProductionProfileCalculator().calculate(weatherForecast);
             }
         });
@@ -69,6 +70,7 @@ public class NetworkAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, dependencies.demandProfileRefreshFrequency().toMillis()) {
             @Override
             protected void onTick() {
+                log.info("Refreshing demand profile");
                 demandProfile = dependencies.electricityDemandProfileCalculator().calculate(weatherForecast);
             }
         });
@@ -77,8 +79,10 @@ public class NetworkAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, dependencies.inbalancementCheckRefreshFrequency().toMillis()) {
             @Override
             protected void onTick() {
+                log.info("checking inbalancement");
                 final DemandAndProduction demandAndProduction = calculateDemandAndProduction();
 
+                log.info("Demand and production: {}", demandAndProduction);
                 if (safetyTresholdNotKept(demandAndProduction)) {
                     final ExpectedInbalancement expectedInbalancement = ExpectedInbalancement.builder()
                             .since(ZonedDateTime.now())

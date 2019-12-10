@@ -3,6 +3,9 @@ package pl.wut.wsd.dsm.agent.trust_factor;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.RankingReader;
@@ -30,7 +33,6 @@ public class CustomerTrustAgent extends Agent {
         final CustomerTrustAgentDependencies dependencies = (CustomerTrustAgentDependencies) getArguments()[0];
         this.trustRankingRefresher = dependencies.getTrustRankingRefresher();
         this.rankingReader = dependencies.getRankingReader();
-
         addBehaviour(new MessageHandler(this,
                 MessageSpecification.of(GetCustomerTrustProtocol.customerTrustRequest.toMessageTemplate(), this::handleRankingRequest)
         ));
@@ -40,6 +42,18 @@ public class CustomerTrustAgent extends Agent {
                 refreshRanking();
             }
         });
+        registerToRzułteStrony();
+    }
+
+    private void registerToRzułteStrony() {
+        final DFAgentDescription dfAgentDescription = new DFAgentDescription();
+        dfAgentDescription.setName(getAID());
+        dfAgentDescription.addServices(GetCustomerTrustProtocol.customerTrustRequest.getTargetService());
+        try {
+            DFService.register(this, dfAgentDescription);
+        } catch (final FIPAException e) {
+            log.error("Could not register to whitepages", e);
+        }
     }
 
     private void refreshRanking() {
@@ -57,6 +71,7 @@ public class CustomerTrustAgent extends Agent {
         final AID sender = message.getSender();
         final ACLMessage reply = GetCustomerTrustProtocol.customerTrustRankingResponse.templatedMessage();
         reply.addReceiver(sender);
+        reply.setConversationId(message.getConversationId());
 
         refreshRanking();
         final CustomerTrustRanking computedRanking = computeRanking(decoded.result());

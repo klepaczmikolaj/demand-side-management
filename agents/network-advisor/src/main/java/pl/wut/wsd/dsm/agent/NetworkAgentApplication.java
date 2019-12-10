@@ -23,9 +23,9 @@ public class NetworkAgentApplication {
     private static final String weatherforecastCity = "Warsaw";
     private static final String weatherForecastCountryCode = "PL";
     private static final Duration weatherRefreshFrequency = Duration.ofSeconds(60);
-    private static final Duration demandProfileRefreshFrequency = Duration.ofMinutes(5);
-    private static final Duration productionProfileRefreshFrequency = Duration.ofMinutes(5);
-    private static final Duration inbalancementCheckRefresFrequency = Duration.ofMinutes(5);
+    private static final Duration demandProfileRefreshFrequency = Duration.ofSeconds(30);
+    private static final Duration productionProfileRefreshFrequency = Duration.ofSeconds(301);
+    private static final Duration inbalancementCheckRefresFrequency = Duration.ofMinutes(1);
     private static final double safetyTreshold = 50;
     private static final ElectricityDemandProfileCalculator demandCalc = forecast -> time -> BigInteger.TEN;
     private static final ElectricityProductionProfileCalculator productionCalc = forecast -> time -> BigInteger.valueOf(50L);

@@ -11,6 +11,8 @@ import pl.wut.wsd.dsm.protocol.ProtocolStep;
 import pl.wut.wsd.dsm.protocol.TargetedStep;
 import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class GetCustomerTrustProtocol extends Protocol {
 
@@ -19,23 +21,41 @@ public class GetCustomerTrustProtocol extends Protocol {
     @Getter
     private static final GetCustomerTrustProtocol instance = new GetCustomerTrustProtocol();
 
-    public static TargetedStep<GetCustomerTrustProtocol, GetTrustRankingRequest> customerTrustRequest = TargetedStep.
-            <GetCustomerTrustProtocol, GetTrustRankingRequest>targetedBuilder()
-            .stepName("Send customer trust request")
-            .messageClass(GetTrustRankingRequest.class)
-            .protocol(instance)
-            .targetService(descriptionFactory.nameAndProperties("customer-trust-agent"))
-            .required(true)
-            .performative(ACLMessage.QUERY_REF)
-            .build();
+    public static CustomerTrustResponse customerTrustRankingResponse = new CustomerTrustResponse();
+    public static CustomerTrustRequest customerTrustRequest = new CustomerTrustRequest();
 
-    public static ProtocolStep<GetCustomerTrustProtocol, CustomerTrustRanking> customerTrustRankingResponse = ProtocolStep.
-            <GetCustomerTrustProtocol, CustomerTrustRanking>builder()
-            .stepName("Customer trust ranking response")
-            .messageClass(CustomerTrustRanking.class)
-            .protocol(instance)
-            .required(true)
-            .performative(ACLMessage.INFORM)
-            .build();
+
+    public static class CustomerTrustRequest extends TargetedStep<GetCustomerTrustProtocol, GetTrustRankingRequest> {
+
+        private CustomerTrustRequest() {
+            super("Send customer trust request", ACLMessage.QUERY_REF, true, GetTrustRankingRequest.class, instance, descriptionFactory.nameAndProperties("customer-trust-agent"));
+        }
+
+        ACLMessage toRequest(final UUID conversationId, final String content) {
+            final ACLMessage message = super.templatedMessage();
+            message.setConversationId(conversationId.toString());
+            message.setContent(content);
+
+            return message;
+        }
+
+    }
+
+
+    public static class CustomerTrustResponse extends ProtocolStep<GetCustomerTrustProtocol, CustomerTrustRanking> {
+
+        private CustomerTrustResponse() {
+            super("Customer trust ranking response", ACLMessage.INFORM, true, CustomerTrustRanking.class, instance);
+        }
+
+        public ACLMessage prepareResponse(final String requestConverastionId, final String content) {
+            final ACLMessage aclMessage = super.templatedMessage();
+            aclMessage.setConversationId(requestConverastionId);
+            aclMessage.setContent(content);
+
+            return aclMessage;
+        }
+    }
+
 
 }
