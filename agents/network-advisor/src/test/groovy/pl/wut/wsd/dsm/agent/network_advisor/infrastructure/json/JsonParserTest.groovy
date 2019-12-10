@@ -16,7 +16,6 @@ class JsonParserTest extends Specification {
         then:
         noExceptionThrown()
         result.code == '200'
-
     }
 
 
