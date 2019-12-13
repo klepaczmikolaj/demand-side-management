@@ -25,6 +25,7 @@
         <logback.version>1.2.3</logback.version>
         <okhttp.version>4.2.2</okhttp.version>
         <hibernate.version>5.4.9.Final</hibernate.version>
+        <mysql.connector.version>8.0.18</mysql.connector.version>
         <!--++++++++++++++++++++Infrastructure++++++++++++++++++-->
         <infrastructure.messaging.version>1.0-SNAPSHOT</infrastructure.messaging.version>
         <infrastructure.common.version>1.0-SNAPSHOT</infrastructure.common.version>
@@ -41,7 +42,6 @@
         <draft.protocol.version>1.0-SNAPSHOT</draft.protocol.version>
         <system.draft.protocol.version>1.0-SNAPSHOT</system.draft.protocol.version>
         <customer.trust.protocol.version>1.0-SNAPSHOT</customer.trust.protocol.version>
-        <mysql.connector.version>8.0.18</mysql.connector.version>
         <maven.compiler.version>3.8.1</maven.compiler.version>
         <commons.cli.version>1.4</commons.cli.version>
     </properties>
@@ -134,7 +134,7 @@
             </dependency>
             <dependency>
                 <groupId>pl.wut.wsd.dsm</groupId>
-                <artifactId>draft-protocol</artifactId>
+                <artifactId>customer-draft-protocol</artifactId>
                 <version>${draft.protocol.version}</version>
             </dependency>
             <dependency>

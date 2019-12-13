@@ -12,7 +12,7 @@
     <artifactId>protocols</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>inform-quote-manager</module>
+        <module>customer-draft</module>
         <module>commons</module>
         <module>customer-trust</module>
         <module>system-draft</module>

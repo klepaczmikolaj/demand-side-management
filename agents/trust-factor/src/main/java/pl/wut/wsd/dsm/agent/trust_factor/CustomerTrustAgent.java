@@ -42,10 +42,10 @@ public class CustomerTrustAgent extends Agent {
                 refreshRanking();
             }
         });
-        registerToRzułteStrony();
+        registerToYellowpages();
     }
 
-    private void registerToRzułteStrony() {
+    private void registerToYellowpages() {
         final DFAgentDescription dfAgentDescription = new DFAgentDescription();
         dfAgentDescription.setName(getAID());
         dfAgentDescription.addServices(GetCustomerTrustProtocol.customerTrustRequest.getTargetService());

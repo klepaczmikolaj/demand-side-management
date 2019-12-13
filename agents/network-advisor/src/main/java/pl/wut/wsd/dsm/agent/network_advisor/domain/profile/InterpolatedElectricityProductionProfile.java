@@ -22,7 +22,6 @@ public class InterpolatedElectricityProductionProfile implements ElectricityProd
 
         final Dates closestDates = findClosesDates(at, sortedDates);
 
-
         return null;
     }
 

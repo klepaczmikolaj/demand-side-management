@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EnergyConsumptionIncrease {
-    private double availIncrease;
+    private double availKws;
     private ZonedDateTime since;
     private ZonedDateTime until;
 }

@@ -27,12 +27,12 @@ public class TrustRankingComputer {
         final List<Obligation> obligationsSuccedeed = states.getOrDefault(CustomerObligationState.KEPT, Collections.emptyList());
 
         final double failedObligationsWeight = failedObligations.stream()
-                .map(obligation -> (1 - (obligation.getPerecentageKept())) * obligation.getSizeKws())
-                .reduce(0.0, Double::sum);
+                .mapToDouble(obligation -> (1 - (obligation.getPerecentageKept())) * obligation.getSizeKws())
+                .sum();
 
         final double obligationsSucceededWeight = obligationsSuccedeed.stream()
-                .map(Obligation::getSizeKws)
-                .reduce(0.0, Double::sum);
+                .mapToDouble(Obligation::getSizeKws)
+                .sum();
 
         final Double currentValue = customerTrust.getCurrentValue();
         final Double kwsProcessed = customerTrust.getKwsProcessed();

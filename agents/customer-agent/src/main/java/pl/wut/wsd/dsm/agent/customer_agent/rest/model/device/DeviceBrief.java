@@ -1,9 +1,11 @@
 package pl.wut.wsd.dsm.agent.customer_agent.rest.model.device;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 public class DeviceBrief {
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
 }

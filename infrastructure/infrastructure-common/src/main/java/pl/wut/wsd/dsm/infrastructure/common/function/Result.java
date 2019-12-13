@@ -55,6 +55,10 @@ public class Result<L, R> {
         return this.isValid() ? Result.ok(mapper.apply(this.result)) : Result.error(this.error);
     }
 
+    public <X> Result<X, R> flatMap(final Function<L, Result<X, R>> mapper) {
+        return this.isValid() ? mapper.apply(this.result) : Result.error(this.error);
+    }
+
     public boolean isValid() {
         return result != null;
     }

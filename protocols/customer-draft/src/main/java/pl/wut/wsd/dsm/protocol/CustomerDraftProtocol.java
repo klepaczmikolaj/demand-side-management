@@ -18,11 +18,16 @@ import static jade.lang.acl.ACLMessage.CFP;
 public class CustomerDraftProtocol extends Protocol {
 
     @Getter
-    private final SendClientOffer sendClientOffer;
+    private final SendOfferForHandlerProcessing sendOfferToHandler;
 
     @Getter
-    /** Send client decision to quote manager. */
-    private final TargetedStep sendClientDecision;
+    private final SendCustomerOffer sendCustomerOffer;
+
+    @Getter
+    /**
+     * Send client decision to quote manager.
+     */
+    private final TargetedStep<CustomerDraftProtocol, CustomerObligation> sendClientDecision;
 
     @Getter
     private final AcceptClientDecision acceptClientDecision;
@@ -31,7 +36,7 @@ public class CustomerDraftProtocol extends Protocol {
     public CustomerDraftProtocol() {
         final ServiceDescriptionFactory factory = new ServiceDescriptionFactory();
 
-        sendClientOffer = new SendClientOffer(this);
+        sendOfferToHandler = new SendOfferForHandlerProcessing(this);
 
         sendClientDecision = TargetedStep.<CustomerDraftProtocol, CustomerObligation>targetedBuilder()
                 .stepName("Send client decision")
@@ -42,13 +47,15 @@ public class CustomerDraftProtocol extends Protocol {
                 .protocol(this)
                 .build();
 
+
         acceptClientDecision = new AcceptClientDecision(this);
+        sendCustomerOffer = new SendCustomerOffer(this);
     }
 
-    public static class SendClientOffer extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
+    public static class SendOfferForHandlerProcessing extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
         private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
-        private SendClientOffer(final @NonNull CustomerDraftProtocol protocol) {
+        private SendOfferForHandlerProcessing(final @NonNull CustomerDraftProtocol protocol) {
             super("Send client offer", CFP, true, CustomerOffer.class, protocol);
         }
 
@@ -61,13 +68,26 @@ public class CustomerDraftProtocol extends Protocol {
     public static class AcceptClientDecision extends ProtocolStep<CustomerDraftProtocol, CustomerObligation> {
         private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
-        protected AcceptClientDecision(final @NonNull CustomerDraftProtocol protocol) {
+        AcceptClientDecision(final @NonNull CustomerDraftProtocol protocol) {
             super("Send client decision", ACCEPT_PROPOSAL, false, CustomerObligation.class, protocol);
         }
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {
             return serviceDescriptionFactory
                     .nameAndProperties("customer-handler", new Property("customerId", targetCustomer.getCustomerId()));
+        }
+    }
+
+    public static class SendCustomerOffer extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
+        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
+
+        protected SendCustomerOffer(final @NonNull CustomerDraftProtocol protocol) {
+            super("Send customer offer", CFP, true, CustomerOffer.class, protocol);
+        }
+
+        public ServiceDescription serviceDescription(final Customer targetCustomer) {
+            return serviceDescriptionFactory
+                    .nameAndProperties("customer-agent", new Property("customerId", targetCustomer.getCustomerId()));
         }
     }
 }

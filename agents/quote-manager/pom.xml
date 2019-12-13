@@ -20,7 +20,7 @@
 
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>
-            <artifactId>draft-protocol</artifactId>
+            <artifactId>customer-draft-protocol</artifactId>
         </dependency>
 
         <dependency>

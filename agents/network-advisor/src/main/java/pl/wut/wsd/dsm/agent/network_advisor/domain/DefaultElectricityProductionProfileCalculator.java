@@ -10,8 +10,8 @@ public class DefaultElectricityProductionProfileCalculator implements Electricit
 
     @Override
     public ElectricityProductionProfile calculate(final WeatherForecast weatherForecast) {
-        for (WeatherForecastEntry entry : weatherForecast.getEntries()) {
-            entry.getMeasurementDate()
+        for (final WeatherForecastEntry entry : weatherForecast.getEntries()) {
+//            entry.getMeasurementDate()
         }
         return time -> BigInteger.valueOf(50L);
     }

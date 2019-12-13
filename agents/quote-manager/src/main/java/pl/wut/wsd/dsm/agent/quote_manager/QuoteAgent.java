@@ -9,6 +9,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.agent.quote_manager.draft.DraftManagement;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
@@ -16,6 +17,7 @@ import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.OneShotMessageSpec;
+import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionIncrease;
 import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionReduction;
@@ -28,6 +30,7 @@ import pl.wut.wsd.dsm.protocol.SystemDraftProtocol;
 import pl.wut.wsd.dsm.protocol.customer_trust.GetCustomerTrustProtocol;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,6 +48,7 @@ public class QuoteAgent extends Agent {
             MessageSpecification.of(customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse),
             MessageSpecification.of(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().toMessageTemplate(), this::processNewDraft)
     ));
+    private final DraftManagement draftManagement = new DraftManagement();
 
     @Override
     protected void setup() {
@@ -69,6 +73,7 @@ public class QuoteAgent extends Agent {
             } else if (trustServiceSearchResult.result().isEmpty()) {
                 log.info("No trust service found");
             } else {
+                draftManagement.startNewDraft(inbalancement.getSince(), inbalancement.getUntil());
                 final DFAgentDescription trustServiceAgent = trustServiceSearchResult.result().get(0);
 
                 final ACLMessage trustRequest = GetCustomerTrustProtocol.customerTrustRequest.templatedMessage();
@@ -83,13 +88,6 @@ public class QuoteAgent extends Agent {
 
                 log.info("Sending message to trust agent", trustRequest);
                 send(trustRequest);
-
-                //Remove message handler behaviour to process trust agent response
-                final MessageTemplate responseTemplate = MessageTemplate.and(
-                        GetCustomerTrustProtocol.customerTrustRankingResponse.toMessageTemplate(),
-                        MessageTemplate.MatchConversationId(trustRequest.getConversationId())
-                );
-
                 registerResponseHandler(trustRequest.getConversationId(), GetCustomerTrustProtocol.customerTrustRankingResponse.toMessageTemplate(), message -> continueProcessAfterTrustResponse(message, inbalancement));
             }
         }
@@ -105,21 +103,25 @@ public class QuoteAgent extends Agent {
             final List<CustomerTrustRankingEntry> ranking = decodingResult.result().getRankingEntries();
             final Map<Long, CustomerOffer> offerByCustomerId = prepareCustomerOffers(ranking, expectedInbalancement);
 
+            draftManagement.registerClientOffers(new HashSet<>(offerByCustomerId.values()));
+
             offerByCustomerId.forEach(this::SendCustomerOffer);
         }
     }
 
     private void SendCustomerOffer(final Long customerId, final CustomerOffer customerOffer) {
-        final ServiceDescription customerService = customerDraftProtocol.sendClientOffer().serviceDescription(new Customer(customerId));
+        final ServiceDescription customerService = customerDraftProtocol.sendOfferToHandler().serviceDescription(new Customer(customerId));
         final Result<List<DFAgentDescription>, FIPAException> searchResult = serviceDiscovery.findServices(customerService);
         if (searchResult.isValid()) {
-            final ACLMessage message = customerDraftProtocol.sendClientOffer().templatedMessage();
-            message.setConversationId(UUID.randomUUID().toString());
-            message.setContent(codec.encode(customerOffer));
-            send(message);
-            registerResponseHandler(message.getConversationId(),
-                    customerDraftProtocol.sendClientDecision().toMessageTemplate(),
-                    this::processClientResponse);
+            if (!searchResult.result().isEmpty()) {
+                final ACLMessage message = customerDraftProtocol.sendOfferToHandler().templatedMessage();
+                message.setConversationId(UUID.randomUUID().toString());
+                message.setContent(codec.encode(customerOffer));
+                message.addReceiver(searchResult.result().get(0).getName());
+                registerResponseHandler(message.getConversationId(), customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse);
+                send(message);
+                log.info("Customer offer sent");
+            }
         } else {
             log.error("Could not send customer offer to customer {}, because {}", customerId, searchResult.error().getMessage());
         }
@@ -147,7 +149,14 @@ public class QuoteAgent extends Agent {
     }
 
     private void processClientResponse(final ACLMessage message) {
-        log.info("Processing client response");
+        final Class<CustomerObligation> messageClass = customerDraftProtocol.sendClientDecision().getMessageClass();
+        final Result<CustomerObligation, DecodingError> decodingResult = codec.decode(message.getContent(), messageClass);
+        if (decodingResult.isValid()) {
+            draftManagement.registerCustomerObligation(decodingResult.result());
+        } else {
+            log.error("Could not decode customer obligation", decodingResult.error().getCause());
+        }
+
     }
 
     private void registerToWhitepages() {
@@ -166,4 +175,5 @@ public class QuoteAgent extends Agent {
 
         messageHandler.addSpecification(new OneShotMessageSpec(templateWithConversationId, responseHandler));
     }
+
 }

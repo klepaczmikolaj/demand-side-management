@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>
-            <artifactId>customer-ontology</artifactId>
+            <artifactId>customer-draft-protocol</artifactId>
         </dependency>
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>

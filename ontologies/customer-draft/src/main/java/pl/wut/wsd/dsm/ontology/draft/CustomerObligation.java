@@ -7,6 +7,7 @@ import java.util.UUID;
 @Data
 public class CustomerObligation {
     private UUID relatedOfferId;
-    private EnergyConsumptionIncrease increase;
-    private EnergyConsumptionReduction reduction;
+    private ObligationType obligationType;
+    private double kwsIncrease;
+    private double kwsDecrease;
 }
