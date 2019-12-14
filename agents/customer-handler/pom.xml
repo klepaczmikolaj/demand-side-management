@@ -26,22 +26,14 @@
             <groupId>pl.wut.wsd.dsm</groupId>
             <artifactId>infrastructure-messaging</artifactId>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>infrastructure-persistence</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-java8</artifactId>
         </dependency>
         <dependency>
             <groupId>pl.wut.wsd.dsm</groupId>

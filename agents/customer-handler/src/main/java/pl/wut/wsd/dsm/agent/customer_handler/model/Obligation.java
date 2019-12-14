@@ -1,11 +1,14 @@
 package pl.wut.wsd.dsm.agent.customer_handler.model;
 
 import lombok.Data;
+import pl.wut.wsd.dsm.infrastructure.persistence.model.Identifiable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 
@@ -44,4 +47,8 @@ public class Obligation extends Identifiable<Long> {
      */
     @Column(name = "until")
     private ZonedDateTime until;
+
+    @OneToOne
+    @JoinColumn(name = "offer_id")
+    private Offer relatedOffer;
 }

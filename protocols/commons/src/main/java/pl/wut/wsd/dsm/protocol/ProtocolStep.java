@@ -23,6 +23,7 @@ public class ProtocolStep<T extends Protocol, C> {
     @Getter
     private final Class<C> messageClass;
 
+    @Getter
     private final T protocol;
 
     @Builder

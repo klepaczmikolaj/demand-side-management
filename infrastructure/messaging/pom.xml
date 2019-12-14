@@ -40,6 +40,10 @@
             <version>1.10.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>protocol-commons</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

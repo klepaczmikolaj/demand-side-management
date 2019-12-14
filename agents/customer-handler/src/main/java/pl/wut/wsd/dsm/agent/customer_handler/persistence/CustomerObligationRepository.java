@@ -8,5 +8,6 @@ import java.util.UUID;
 public interface CustomerObligationRepository {
 
     List<Obligation> getCustomerObligations(UUID customerId);
+
     void saveOrUpdate(Obligation obligation);
 }

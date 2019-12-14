@@ -1,9 +1,9 @@
 package pl.wut.wsd.dsm.agent.customer_handler.persistence;
 
 import lombok.RequiredArgsConstructor;
-import pl.wut.wsd.dsm.agent.customer_handler.infrastructure.hibernate.HibernateTemplate;
 import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation;
 import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation_;
+import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
 
 import java.util.List;
 import java.util.UUID;
