@@ -14,24 +14,36 @@ import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 import static jade.lang.acl.ACLMessage.ACCEPT_PROPOSAL;
 import static jade.lang.acl.ACLMessage.CFP;
 
+/**
+ * Multistep protocol. Describes interactions of all parts involved in customer draft process.
+ */
 @Accessors(fluent = true)
 public class CustomerDraftProtocol extends Protocol {
 
     @Getter
+    /**
+     * Offer sent to customer handler, customer handler should parse offer, modify fields if needed and than pass it to customer agent.
+     */
     private final SendOfferForHandlerProcessing sendOfferToHandler;
 
     @Getter
+    /**
+     * Offer sent to customer agent, customer agent should notify customer.
+     */
     private final SendCustomerOffer sendCustomerOffer;
 
     @Getter
+    /**
+     * Customer response for customer agent. Contains customer obligation related to current offer.
+     * Customer agent should perform initial validations and handle offer to customer handler.
+     */
     private final AcceptClientDecision acceptClientDecision;
 
     @Getter
     /**
-     * Send client decision to quote manager.
+     * Client decision passed from customer agent to customer handler.
      */
     private final TargetedStep<CustomerDraftProtocol, CustomerObligation> sendClientDecision;
-
 
 
     public CustomerDraftProtocol() {

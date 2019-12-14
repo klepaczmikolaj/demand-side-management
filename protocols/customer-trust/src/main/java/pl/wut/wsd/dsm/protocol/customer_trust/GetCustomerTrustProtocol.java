@@ -14,15 +14,25 @@ import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+/**
+ * Customer trust protocool. Consists of two simple steps, request and response.
+ * No refresh is necessary in protocol because customerTrustService should perform refreshes as often and possible and make sure that
+ * response sent is valid.
+ * */
 public class GetCustomerTrustProtocol extends Protocol {
 
     private static final ServiceDescriptionFactory descriptionFactory = new ServiceDescriptionFactory();
-
     @Getter
     private static final GetCustomerTrustProtocol instance = new GetCustomerTrustProtocol();
 
-    public static CustomerTrustResponse customerTrustRankingResponse = new CustomerTrustResponse();
+    /**
+     * Request
+     */
     public static CustomerTrustRequest customerTrustRequest = new CustomerTrustRequest();
+    /**
+     * Response containing customer trust ranking.
+     */
+    public static CustomerTrustResponse customerTrustRankingResponse = new CustomerTrustResponse();
 
 
     public static class CustomerTrustRequest extends TargetedStep<GetCustomerTrustProtocol, GetTrustRankingRequest> {
