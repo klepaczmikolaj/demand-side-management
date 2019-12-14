@@ -1,6 +1,11 @@
 package pl.wut.wsd.dsm.agent.customer_handler.model;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import pl.wut.wsd.dsm.infrastructure.persistence.model.Identifiable;
 
 import javax.persistence.Column;
@@ -10,45 +15,49 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.time.ZonedDateTime;
 
-@Data
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor
 @Entity
-@Table(name = "OBLIGATION")
+@Table(name = "obligation")
 public class Obligation extends Identifiable<Long> {
 
-    @Column(name = "CUSTOMER_ID")
+    @NonNull
+    @Column(name = "customer_id")
     private Long customerId;
 
-    @Column(name = "STATE")
+    @NonNull
+    @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private CustomerObligationState state;
 
     /**
      * Obligation size in kiloWatts.
      */
-    @Column(name = "SIZE")
+    @NonNull
+    @Column(name = "size")
     private double sizeKws;
 
     /**
      * How many percents of obligation were kept. 100% for KEPT.
      */
-    @Column(name = "PERCENTAGE_KEPT")
+    @Getter
+    @Setter
+    @Column(name = "percentage_kept")
     private double perecentageKept;
 
-    /**
-     * Obligation period start time.
-     */
-    @Column(name = "SINCE")
-    private ZonedDateTime since;
-
-    /**
-     * Obligation period end time.
-     */
-    @Column(name = "until")
-    private ZonedDateTime until;
-
+    @NonNull
     @OneToOne
     @JoinColumn(name = "offer_id")
     private Offer relatedOffer;
+
+    public static Obligation newObligation(final Long customerId, final double acceptedKws, final Offer relatedOffer) {
+        final Obligation obligation = new Obligation(customerId, CustomerObligationState.DURING_EVALUATION, acceptedKws, relatedOffer);
+        relatedOffer.setObligation(obligation);
+
+        return obligation;
+    }
+
 }

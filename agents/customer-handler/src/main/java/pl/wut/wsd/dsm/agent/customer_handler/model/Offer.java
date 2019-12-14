@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -53,6 +54,10 @@ public class Offer extends Identifiable<Long> {
     private Double kws;
 
     @NonNull
+    @Column(name = "price", nullable = false)
+    private BigDecimal pricePerKw;
+
+    @NonNull
     @Column(name = "demand_change_since", nullable = false)
     private ZonedDateTime demandChangeSince;
 
@@ -64,11 +69,11 @@ public class Offer extends Identifiable<Long> {
     @OneToOne(mappedBy = "relatedOffer", fetch = FetchType.LAZY)
     private Obligation obligation;
 
-    enum State {
+    public enum State {
         PENDING, ACCEPTED
     }
 
-    enum Type {
+    public enum Type {
         INCREASE, REDUCTION
     }
 
@@ -76,9 +81,10 @@ public class Offer extends Identifiable<Long> {
                                   @NonNull final Long customerId,
                                   @NonNull final ZonedDateTime validUntil,
                                   @NonNull final Double kws,
+                                  @NonNull final BigDecimal pricePerKw,
                                   @NonNull final ZonedDateTime demandChangeSince,
                                   @NonNull final ZonedDateTime demandChangeUntil) {
-        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.REDUCTION, kws, demandChangeSince, demandChangeUntil);
+        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.REDUCTION, kws, pricePerKw, demandChangeSince, demandChangeUntil);
     }
 
     @Builder(builderMethodName = "increase", buildMethodName = "increase", access = AccessLevel.PUBLIC)
@@ -86,8 +92,9 @@ public class Offer extends Identifiable<Long> {
                                  @NonNull final Long customerId,
                                  @NonNull final ZonedDateTime validUntil,
                                  @NonNull final Double kws,
+                                 @NonNull final BigDecimal pricePerKw,
                                  @NonNull final ZonedDateTime demandChangeSince,
                                  @NonNull final ZonedDateTime demandChangeUntil) {
-        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.INCREASE, kws, demandChangeSince, demandChangeUntil);
+        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.INCREASE, kws, pricePerKw, demandChangeSince, demandChangeUntil);
     }
 }

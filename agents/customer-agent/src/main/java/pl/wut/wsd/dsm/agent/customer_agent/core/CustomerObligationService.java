@@ -79,7 +79,7 @@ public class CustomerObligationService implements ObligationsService, OffersServ
         final CustomerOfferRepresentation representation = new CustomerOfferRepresentation();
         representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
         Optional.ofNullable(offer.getEnergyConsumptionReduction()).ifPresent(r -> {
-            representation.setReducedKws(r.getAvailReduction());
+            representation.setReducedKws(r.getSizeKws());
             representation.setDemandChangeStart(r.getSince());
             representation.setDemandChangeEnd(r.getUntil());
         });

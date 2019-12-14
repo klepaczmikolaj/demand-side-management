@@ -12,32 +12,32 @@ import java.time.ZonedDateTime;
 
 @Data
 @Entity
-@Table(name = "OBLIGATION")
+@Table(name = "obligation_view")
 public class Obligation extends Identifiable<Long> {
 
-    @Column(name = "CUSTOMER_ID")
+    @Column(name = "customer_id")
     private Long customerId;
 
-    @Column(name = "STATE")
+    @Column(name = "state")
     @Enumerated(EnumType.STRING)
     private CustomerObligationState state;
 
     /**
      * Obligation size in kiloWatts.
      */
-    @Column(name = "SIZE")
+    @Column(name = "size")
     private double sizeKws;
 
     /**
      * How many percents of obligation were kept. 100% for KEPT.
      */
-    @Column(name = "PERCENTAGE_KEPT")
+    @Column(name = "percentage_kept")
     private double perecentageKept;
 
     /**
      * Obligation period start time.
      */
-    @Column(name = "SINCE")
+    @Column(name = "since")
     private ZonedDateTime since;
 
     /**

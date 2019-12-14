@@ -6,6 +6,7 @@ import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_handler.CustomerHandlerAgent;
+import pl.wut.wsd.dsm.agent.customer_handler.mapper.CustomerHandlerTypesMapper;
 import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerOfferRepository;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
@@ -13,13 +14,9 @@ import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.handle.ParsingHandler;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionIncrease;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionReduction;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 public class CustomerOfferHandler extends ParsingHandler<CustomerOffer, CustomerDraftProtocol.SendCustomerOffer> {
@@ -28,12 +25,14 @@ public class CustomerOfferHandler extends ParsingHandler<CustomerOffer, Customer
     private final ServiceDiscovery serviceDiscovery;
     private final CustomerDraftProtocol protocol = protocolStep.getProtocol();
     private final CustomerOfferRepository customerOfferRepository;
+    private final CustomerHandlerTypesMapper customerHandlerTypesMapper;
 
-    public CustomerOfferHandler(final Codec codec, final CustomerDraftProtocol.SendCustomerOffer protocolStep, final CustomerHandlerAgent customerHandlerAgent, final ServiceDiscovery serviceDiscovery, final CustomerOfferRepository customerOfferRepository) {
+    public CustomerOfferHandler(final Codec codec, final CustomerDraftProtocol.SendCustomerOffer protocolStep, final CustomerHandlerAgent customerHandlerAgent, final ServiceDiscovery serviceDiscovery, final CustomerOfferRepository customerOfferRepository, final CustomerHandlerTypesMapper customerHandlerTypesMapper) {
         super(codec, protocolStep);
         this.customerHandlerAgent = customerHandlerAgent;
         this.serviceDiscovery = serviceDiscovery;
         this.customerOfferRepository = customerOfferRepository;
+        this.customerHandlerTypesMapper = customerHandlerTypesMapper;
     }
 
     @Override
@@ -53,16 +52,8 @@ public class CustomerOfferHandler extends ParsingHandler<CustomerOffer, Customer
         }
     }
 
-    private void persistOffer(final Customer cus, final CustomerOffer co) {
-        final EnergyConsumptionReduction reduction = co.getEnergyConsumptionReduction();
-        final EnergyConsumptionIncrease increase = co.getEnergyConsumptionIncrease();
-        final ZonedDateTime validUntil = co.getValidUntil();
-        final UUID offerId = co.getOfferId();
-
-        final Offer offer = increase == null ?
-                Offer.reduction(offerId, cus.getCustomerId(), validUntil, reduction.getAvailReduction(), reduction.getSince(), reduction.getUntil()) :
-                Offer.increase(offerId, cus.getCustomerId(), validUntil, increase.getAvailKws(), increase.getSince(), increase.getUntil());
-
+    private void persistOffer(final Customer customer, final CustomerOffer customerOffer) {
+        final Offer offer = customerHandlerTypesMapper.mapToEntity(customerOffer, customer.getCustomerId());
         customerOfferRepository.saveOffer(offer);
     }
 
