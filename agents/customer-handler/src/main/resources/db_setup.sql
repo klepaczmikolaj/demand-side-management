@@ -20,6 +20,15 @@ SET DEFAULT ROLE 'wsd_read', 'wsd_write', 'wsd_tables' TO 'wsd_dsm_dev';
 
 FLUSH PRIVILEGES;
 
+create table customer
+(
+  id          bigint(20)   not null auto_increment,
+  first_name  varchar(50)  not null,
+  second_name varchar(50)  not null,
+  password    varchar(500) not null,
+  primary key (id)
+);
+
 create table offer
 (
   id                  bigint(20)  not null auto_increment,
@@ -32,22 +41,38 @@ create table offer
   price               decimal     not null,
   demand_change_since datetime    not null,
   demand_change_until datetime    not null,
-  primary key (id)
+  primary key (id),
+  foreign key (customer_id) references customer (id)
 );
 
 CREATE TABLE `obligation`
 (
   `id`              bigint(20)     NOT NULL AUTO_INCREMENT,
-  `customer_id`     varchar(32)    NOT NULL,
+  `customer_id`     bigint(20)     NOT NULL,
   `state`           varchar(25)    NOT NULL,
   `size`            decimal(10, 2) NOT NULL,
   `percentage_kept` decimal(10, 2) NOT NULL,
   `offer_id`        bigint(20)     NOT NULL,
   PRIMARY KEY (`id`),
-  foreign key (offer_id) references offer (id)
+  foreign key (offer_id) references offer (id),
+  foreign key (customer_id) references customer (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE `customer_trust`
+(
+  `id`            bigint(20)     NOT NULL AUTO_INCREMENT,
+  `customer_id`   bigint(20)     NOT NULL,
+  `current_value` decimal(10, 2) NOT NULL,
+  `kws_processed` decimal(10, 2) NOT NULL,
+
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `customer_id` (`customer_id`),
+  foreign key (customer_id) references customer (id)
+);
+
+
 
 create view obligation_view as
 SELECT ob.*, of.demand_change_since as since, of.demand_change_until as until

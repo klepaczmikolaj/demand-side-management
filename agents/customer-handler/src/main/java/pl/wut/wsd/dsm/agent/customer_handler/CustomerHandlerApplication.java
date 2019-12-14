@@ -32,11 +32,12 @@ public class CustomerHandlerApplication {
         final CustomerObligationRepository obligationRepository = new HibernateCustomerObligationRepository(template);
         final CustomerOfferRepository customerOfferRepository = new HibernateOfferRepository(template);
 
-        final CustomerHandlerDependencies.CustomerHandlerDependenciesBuilder dependencies = CustomerHandlerDependencies.builder()
+        final CustomerHandlerDependencies dependencies = CustomerHandlerDependencies.builder()
                 .codec(Codec.json())
                 .customer(new Customer(properties.customerId()))
                 .customerObligationRepository(obligationRepository)
-                .customerOfferRepository(customerOfferRepository);
+                .customerOfferRepository(customerOfferRepository)
+                .build();
 
         final AgentContainer customerAgentContainer = agentStartupManager.startChildContainer(properties);
 

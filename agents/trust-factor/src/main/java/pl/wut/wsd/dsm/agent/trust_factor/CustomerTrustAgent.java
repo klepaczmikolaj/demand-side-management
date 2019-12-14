@@ -3,9 +3,6 @@ package pl.wut.wsd.dsm.agent.trust_factor;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.RankingReader;
@@ -13,6 +10,7 @@ import pl.wut.wsd.dsm.agent.trust_factor.ranking.TrustRankingRefresher;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.ontology.trust.CustomerTrustRanking;
@@ -42,18 +40,8 @@ public class CustomerTrustAgent extends Agent {
                 refreshRanking();
             }
         });
-        registerToYellowpages();
-    }
-
-    private void registerToYellowpages() {
-        final DFAgentDescription dfAgentDescription = new DFAgentDescription();
-        dfAgentDescription.setName(getAID());
-        dfAgentDescription.addServices(GetCustomerTrustProtocol.customerTrustRequest.getTargetService());
-        try {
-            DFService.register(this, dfAgentDescription);
-        } catch (final FIPAException e) {
-            log.error("Could not register to whitepages", e);
-        }
+        final ServiceRegistration serviceRegistration = new ServiceRegistration(this);
+        serviceRegistration.registerRetryOnFailure(Duration.ofSeconds(5), GetCustomerTrustProtocol.customerTrustRequest.getTargetService());
     }
 
     private void refreshRanking() {

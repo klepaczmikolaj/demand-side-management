@@ -20,7 +20,6 @@ public class ServiceDiscovery {
     public Result<List<DFAgentDescription>, FIPAException> findServices(final ServiceDescription serviceDescription) {
         final DFAgentDescription dfAgentDescription = new DFAgentDescription();
         dfAgentDescription.addServices(serviceDescription);
-
         return callYellowPagesService(dfAgentDescription);
     }
 
@@ -29,7 +28,6 @@ public class ServiceDiscovery {
             final List<DFAgentDescription> agentIds = Arrays.stream(DFService.search(agent, dfAgentDescription))
                     .collect(Collectors.toList());
             return Result.ok(agentIds);
-
         } catch (final FIPAException e) {
             return Result.error(e);
         }

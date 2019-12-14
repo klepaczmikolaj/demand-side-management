@@ -2,7 +2,6 @@ package pl.wut.wsd.dsm.agent.customer_agent.rest;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
-import pl.wut.wsd.dsm.agent.customer_agent.CustomerAgentApiHandle;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Device;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.ApiError;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.CustomerSettings;
@@ -17,6 +16,8 @@ public class ApiInitializer {
     final Codec codec = Codec.json();
 
     public void initialize(final Javalin javalin, final CustomerAgentApiHandle customerAgentApiHandle) {
+        javalin.get("/", ctx -> ctx.result("Hello, customer agent speaking, how can I help you bro"));
+
         javalin.post("/obligation", ctx -> {
             final Result<ObligationRepresentation, ApiError> result = parseBody(ObligationAcceptanceRequest.class, ctx.body())
                     .flatMap(customerAgentApiHandle::postObligation);
@@ -29,9 +30,7 @@ public class ApiInitializer {
 
         });
 
-        javalin.get("/devices", ctx -> {
-            respond(customerAgentApiHandle.getDevices(), ctx);
-        });
+        javalin.get("/devices", ctx -> respond(customerAgentApiHandle.getDevices(), ctx));
 
         javalin.post("/devices/:id/on", ctx -> {
             final Result<Device, ApiError> result = parseBody(Long.class, ctx.pathParam("id"))

@@ -2,9 +2,6 @@ package pl.wut.wsd.dsm.agent.customer_handler;
 
 
 import jade.core.Agent;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
@@ -15,9 +12,12 @@ import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerObligationRepos
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerOfferRepository;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
+
+import java.time.Duration;
 
 @Slf4j
 public class CustomerHandlerAgent extends Agent {
@@ -48,16 +48,11 @@ public class CustomerHandlerAgent extends Agent {
     }
 
     private void registerToWhitepages() {
-        final DFAgentDescription description = new DFAgentDescription();
-        description.setName(this.getAID());
-        description.addServices(customerDraftProtocol.sendOfferToHandler().serviceDescription(customer));
-        description.addServices(customerDraftProtocol.acceptClientDecision().serviceDescription(customer));
+        final ServiceRegistration serviceRegistration = new ServiceRegistration(this);
 
-        try {
-            DFService.register(this, description);
-        } catch (final FIPAException e) {
-            log.error("Could not connect to whitepages", e);
-        }
+        serviceRegistration.registerRetryOnFailure(Duration.ofSeconds(1),
+                customerDraftProtocol.sendOfferToHandler().serviceDescription(customer),
+                customerDraftProtocol.acceptClientDecision().serviceDescription(customer));
     }
 
 

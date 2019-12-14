@@ -1,4 +1,4 @@
-package pl.wut.wsd.dsm.agent.customer_agent;
+package pl.wut.wsd.dsm.agent.customer_agent.rest;
 
 import pl.wut.wsd.dsm.agent.customer_agent.device.Device;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.ApiError;

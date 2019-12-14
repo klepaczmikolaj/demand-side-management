@@ -24,6 +24,7 @@ public class CustomerAgentApplication {
     private static final String mainContainerOption = "container";
     private static final String mainContainerPortOption = "port";
     private static final String customerIdOption = "cid";
+    private static final String firebaseToken = "firebaseToken";
 
     private static final AgentStartupManager startupManager = new AgentStartupManager();
 
@@ -33,6 +34,7 @@ public class CustomerAgentApplication {
         options.addOption(mainContainerOption, true, "Main container path");
         options.addOption(mainContainerPortOption, true, "Main container port");
         options.addOption(customerIdOption, true, "Customer id");
+        options.addOption(firebaseToken, true, "Firebase token");
 
         final AgentConfiguration initialConfiguration = CommandLineConfiguration.of(options, args).throwingGet(Exception::new);
         final AgentConfiguration updatedConfiguration = initialConfiguration.getProperty(configFileOption, Paths::get)
