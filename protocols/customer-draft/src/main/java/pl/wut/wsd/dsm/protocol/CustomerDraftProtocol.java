@@ -24,19 +24,24 @@ public class CustomerDraftProtocol extends Protocol {
     private final SendCustomerOffer sendCustomerOffer;
 
     @Getter
+    private final AcceptClientDecision acceptClientDecision;
+
+    @Getter
     /**
      * Send client decision to quote manager.
      */
     private final TargetedStep<CustomerDraftProtocol, CustomerObligation> sendClientDecision;
 
-    @Getter
-    private final AcceptClientDecision acceptClientDecision;
 
 
     public CustomerDraftProtocol() {
         final ServiceDescriptionFactory factory = new ServiceDescriptionFactory();
 
         sendOfferToHandler = new SendOfferForHandlerProcessing(this);
+
+        sendCustomerOffer = new SendCustomerOffer(this);
+
+        acceptClientDecision = new AcceptClientDecision(this);
 
         sendClientDecision = TargetedStep.<CustomerDraftProtocol, CustomerObligation>targetedBuilder()
                 .stepName("Send client decision")
@@ -48,8 +53,6 @@ public class CustomerDraftProtocol extends Protocol {
                 .build();
 
 
-        acceptClientDecision = new AcceptClientDecision(this);
-        sendCustomerOffer = new SendCustomerOffer(this);
     }
 
     public static class SendOfferForHandlerProcessing extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
