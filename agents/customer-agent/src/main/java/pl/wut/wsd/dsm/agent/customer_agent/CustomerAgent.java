@@ -12,6 +12,7 @@ import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
+import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.ApiInitializer;
 import pl.wut.wsd.dsm.agent.customer_agent.settings.SettingsService;
 import pl.wut.wsd.dsm.agent.infrastructure.InetUtils;
@@ -33,6 +34,7 @@ public class CustomerAgent extends Agent {
     private Javalin javalin;
     private Customer customer;
     private Codec codec;
+    private NotificationAdapter notificationAdapter;
 
     @Override
     protected void setup() {
@@ -41,6 +43,7 @@ public class CustomerAgent extends Agent {
         javalin = dependencies.getJavalin();
         customer = dependencies.getCustomer();
         codec = dependencies.getCodec();
+        notificationAdapter = dependencies.getNotificationAdapter();
 
         this.offersService = offerObligationService;
         final DefaultCustomerApiHandle handle = new DefaultCustomerApiHandle(offerObligationService, offerObligationService, new SettingsService(), devices);

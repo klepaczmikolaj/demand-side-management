@@ -6,6 +6,7 @@ import jade.wrapper.AgentContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.Options;
 import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.agent.external.google.GoogleNotificationsAdapter;
 import pl.wut.wsd.dsm.agent.infrastructure.InetUtils;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.properties.config.AgentConfiguration;
@@ -63,6 +64,7 @@ public class CustomerAgentApplication {
                 .javalin(javalin)
                 .javalinPort(javalinPort)
                 .codec(Codec.json())
+                .notificationAdapter(new GoogleNotificationsAdapter())
                 .build();
 
         startupManager.startAgent(container, CustomerAgent.class, "customer-agent" + customerID, dependencies);
