@@ -26,8 +26,10 @@ public class CustomerAgentApplication {
     private static final String mainContainerPortOption = "port";
     private static final String customerIdOption = "cid";
     private static final String firebaseToken = "firebaseToken";
+    private static final String notificationsTokenKey = "notificationApiToken";
 
     private static final AgentStartupManager startupManager = new AgentStartupManager();
+    private static final String notificationCustomerIdKey = "notificationId";
 
     public static void main(final String[] args) throws Exception {
         final Options options = new Options();
@@ -36,6 +38,8 @@ public class CustomerAgentApplication {
         options.addOption(mainContainerPortOption, true, "Main container port");
         options.addOption(customerIdOption, true, "Customer id");
         options.addOption(firebaseToken, true, "Firebase token");
+        options.addOption(notificationsTokenKey, true, "Google notifications constant");
+        options.addOption(notificationCustomerIdKey, true, "Customer google notifications id");
 
         final AgentConfiguration initialConfiguration = CommandLineConfiguration.of(options, args).throwingGet(Exception::new);
         final AgentConfiguration updatedConfiguration = initialConfiguration.getProperty(configFileOption, Paths::get)
@@ -53,6 +57,12 @@ public class CustomerAgentApplication {
         final Long customerID = updatedConfiguration.getProperty(customerIdOption, Long::parseLong)
                 .orElseThrow(() -> new MissingConfigEntryException(customerIdOption, "customer id (long)"));
 
+        final String notificationKey = updatedConfiguration.getProperty(notificationsTokenKey)
+                .orElseThrow(() -> new MissingConfigEntryException(notificationsTokenKey, "notification token (String)"));
+
+        final String customerNotificationId = updatedConfiguration.getProperty(notificationCustomerIdKey)
+                .orElseThrow(() -> new MissingConfigEntryException(notificationCustomerIdKey, "Notification customer id (String)"));
+
 
         final AgentContainer container = createAgentContainer(hostname, containerPort, customerID);
 
@@ -64,7 +74,7 @@ public class CustomerAgentApplication {
                 .javalin(javalin)
                 .javalinPort(javalinPort)
                 .codec(Codec.json())
-                .notificationAdapter(new GoogleNotificationsAdapter())
+                .notificationAdapter(new GoogleNotificationsAdapter(notificationKey, customerNotificationId))
                 .build();
 
         startupManager.startAgent(container, CustomerAgent.class, "customer-agent" + customerID, dependencies);

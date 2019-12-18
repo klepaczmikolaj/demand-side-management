@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerSettings {
-    private double minimalProfit;
+    private Double minimalProfit;
+    private String notificationsKey;
 }

@@ -61,10 +61,13 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
 
     @Override
     public Result<CustomerSettings, ApiError> updateCustomerSettings(final CustomerSettings customerSettings) {
-        if (customerSettings.getMinimalProfit() <= 0) {
+        if (customerSettings.getMinimalProfit() != null && customerSettings.getMinimalProfit() <= 0) {
             return Result.error(ApiError.badRequest("Minimal profit must be greater than 0"));
         }
-        return Result.ok(settingsService.setMinimalProfil(customerSettings.getMinimalProfit()));
+        if (customerSettings.getNotificationsKey() == null || customerSettings.getNotificationsKey().isEmpty()) {
+            return Result.error(ApiError.badRequest("Notification key cannot be null or empty"));
+        }
+        return Result.ok(settingsService.updateCustomerSettings(customerSettings.getMinimalProfit(), customerSettings.getNotificationsKey()));
     }
 
     @Override

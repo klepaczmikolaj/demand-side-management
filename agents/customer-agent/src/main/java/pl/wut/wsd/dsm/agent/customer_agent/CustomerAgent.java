@@ -12,6 +12,7 @@ import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
+import pl.wut.wsd.dsm.agent.customer_agent.notification.CustomerNotification;
 import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.ApiInitializer;
 import pl.wut.wsd.dsm.agent.customer_agent.settings.SettingsService;
@@ -58,6 +59,7 @@ public class CustomerAgent extends Agent {
         log.info("Got client offer!");
         final CustomerOffer offer = codec.decode(aclMessage.getContent(), customerDraftProtocol.sendCustomerOffer().getMessageClass()).result();
         offersService.registerOffer(offer);
+        notificationAdapter.sendNotification(new CustomerNotification("Masz nową wiadomość mordo", codec.encode(offer)));
         //Send customer notification
     }
 
