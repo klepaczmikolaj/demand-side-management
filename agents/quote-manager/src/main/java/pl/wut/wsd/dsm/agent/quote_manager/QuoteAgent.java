@@ -19,8 +19,8 @@ import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.OneShotMessageSpec;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionIncrease;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionReduction;
+import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionChange;
+import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
 import pl.wut.wsd.dsm.ontology.trust.CustomerTrustRanking;
 import pl.wut.wsd.dsm.ontology.trust.CustomerTrustRankingEntry;
@@ -136,14 +136,13 @@ public class QuoteAgent extends Agent {
             customerOffer.setPricePerKw(BigDecimal.ONE);
             customerOffer.setValidUntil(expectedInbalancement.getSince());
             if (wattsDemand > wattsProduction) {
-                customerOffer.setEnergyConsumptionIncrease(
-                        new EnergyConsumptionIncrease((wattsDemand - wattsProduction) / ranking.size(), expectedInbalancement.getSince(), expectedInbalancement.getUntil())
-                );
+                customerOffer.setType(ObligationType.INCREASE);
             } else {
-                customerOffer.setEnergyConsumptionReduction(
-                        new EnergyConsumptionReduction((wattsProduction - wattsDemand) / ranking.size(), expectedInbalancement.getSince(), expectedInbalancement.getUntil())
-                );
+                customerOffer.setType(ObligationType.REDUCTION);
             }
+            customerOffer.setEnergyConsumptionChange(
+                    new EnergyConsumptionChange(Math.abs((wattsDemand - wattsProduction)) / ranking.size(), expectedInbalancement.getSince(), expectedInbalancement.getUntil())
+            );
             return customerOffer;
         }));
     }

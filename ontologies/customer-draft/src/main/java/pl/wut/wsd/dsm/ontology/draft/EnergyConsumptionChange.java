@@ -9,8 +9,8 @@ import java.time.ZonedDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnergyConsumptionReduction {
-    private double sizeKws;
+public class EnergyConsumptionChange {
+    private double availKws;
     private ZonedDateTime since;
     private ZonedDateTime until;
 }

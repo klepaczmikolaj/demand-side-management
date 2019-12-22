@@ -8,6 +8,5 @@ import java.util.UUID;
 public class CustomerObligation {
     private UUID relatedOfferId;
     private ObligationType obligationType;
-    private double kwsIncrease;
-    private double kwsDecrease;
+    private double kwsChange;
 }

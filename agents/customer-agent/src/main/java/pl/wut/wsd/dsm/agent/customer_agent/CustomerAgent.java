@@ -11,18 +11,24 @@ import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
+import pl.wut.wsd.dsm.agent.customer_agent.core.history.ObigationHistoryLocalStore;
+import pl.wut.wsd.dsm.agent.customer_agent.core.history.OfferHistoryLocalStore;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
-import pl.wut.wsd.dsm.agent.customer_agent.notification.CustomerNotification;
 import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.ApiInitializer;
+import pl.wut.wsd.dsm.agent.customer_agent.rest.mapper.ApiTypesMapper;
 import pl.wut.wsd.dsm.agent.customer_agent.settings.SettingsService;
 import pl.wut.wsd.dsm.agent.infrastructure.InetUtils;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
+import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
+import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
+
 
 @Slf4j
 public class CustomerAgent extends Agent {
@@ -36,22 +42,44 @@ public class CustomerAgent extends Agent {
     private Customer customer;
     private Codec codec;
     private NotificationAdapter notificationAdapter;
+    private ObigationHistoryLocalStore obligations;
+    private OfferHistoryLocalStore offers;
 
     @Override
     protected void setup() {
         final CustomerAgentDependencies dependencies = (CustomerAgentDependencies) getArguments()[0];
-        final CustomerObligationService offerObligationService = new CustomerObligationService();
+        obligations = new ObigationHistoryLocalStore();
+        offers = new OfferHistoryLocalStore();
         javalin = dependencies.getJavalin();
         customer = dependencies.getCustomer();
         codec = dependencies.getCodec();
+        final AgentMessagingCapability capability = AgentMessagingCapability.defaultCapability(new ServiceDiscovery(this), this);
+        final CustomerObligationService offerObligationService = new CustomerObligationService(
+                capability,
+                codec,
+                customer,
+                new ApiTypesMapper(),
+                customerDraftProtocol.acceptClientDecision(),
+                obligations,
+                offers
+        );
         notificationAdapter = dependencies.getNotificationAdapter();
 
         this.offersService = offerObligationService;
         final DefaultCustomerApiHandle handle = new DefaultCustomerApiHandle(offerObligationService, offerObligationService, new SettingsService(), devices);
         new ApiInitializer().initialize(dependencies.getJavalin(), handle);
 
-        addBehaviour(new MessageHandler(this, MessageSpecification.of(customerDraftProtocol.sendCustomerOffer().toMessageTemplate(), this::processClientOffer)));
+        addBehaviour(new MessageHandler(this,
+                MessageSpecification.of(customerDraftProtocol.sendCustomerOffer().toMessageTemplate(), this::processClientOffer),
+                MessageSpecification.of(customerDraftProtocol.informOfCustomerHandlerAcceptance().toMessageTemplate(), this::saveObligation)
+        ));
         registerToWhitepages(customer.getCustomerId(), dependencies.getJavalinPort());
+    }
+
+    private void saveObligation(final ACLMessage aclMessage) {
+        log.info("Got obligation acceptance from handler!");
+        final CustomerObligation obligation = codec.decode(aclMessage.getContent(), customerDraftProtocol.informOfCustomerHandlerAcceptance().getMessageClass()).result();
+        obligations.registerCurrentObligation(obligation);
     }
 
 
@@ -59,7 +87,7 @@ public class CustomerAgent extends Agent {
         log.info("Got client offer!");
         final CustomerOffer offer = codec.decode(aclMessage.getContent(), customerDraftProtocol.sendCustomerOffer().getMessageClass()).result();
         offersService.registerOffer(offer);
-        notificationAdapter.sendNotification(new CustomerNotification("Masz nową wiadomość mordo", codec.encode(offer)));
+//        notificationAdapter.sendNotification(new CustomerNotification("Masz nową wiadomość mordo", codec.encode(offer)));
         //Send customer notification
     }
 
@@ -84,6 +112,7 @@ public class CustomerAgent extends Agent {
 
         dfAgentDescription.addServices(serviceDescriptionFactory.nameAndProperties("customer-agent", cusId, restApiAddress));
         dfAgentDescription.addServices(customerDraftProtocol.sendCustomerOffer().serviceDescription(customer));
+        dfAgentDescription.addServices(customerDraftProtocol.informOfCustomerHandlerAcceptance().serviceDescription(customer));
         try {
             DFService.register(this, dfAgentDescription);
         } catch (final FIPAException e) {

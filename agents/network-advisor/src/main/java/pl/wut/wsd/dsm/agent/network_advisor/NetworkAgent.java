@@ -7,6 +7,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.profile.ElectricityDemandProfile;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.profile.ElectricityProductionProfile;
 import pl.wut.wsd.dsm.agent.network_advisor.weather.model.WeatherForecast;
@@ -43,21 +44,7 @@ public class NetworkAgent extends Agent {
         this.demandProfile = dependencies.electricityDemandProfileCalculator().calculate(weatherForecast);
 
         /* Refresh weather behaviour */
-        addBehaviour(new TickerBehaviour(this, dependencies.weatherRefreshDuration().toMillis()) {
-            @Override
-            protected void onTick() {
-                updateWeather();
-            }
-
-            private void updateWeather() {
-                try {
-                    weatherForecast = dependencies.weatherAdapter().getWeatherForecast();
-                    log.info("Forecast refreshed");
-                } catch (final Exception e) {
-                    log.error("Could not update forecast", e);
-                }
-            }
-        });
+        addBehaviour(weatherUpdater());
         /* Refresh production profile */
         addBehaviour(new TickerBehaviour(this, dependencies.productionProfileRefreshFrequency().toMillis()) {
             @Override
@@ -76,7 +63,16 @@ public class NetworkAgent extends Agent {
         });
 
         /* Inform quote manager of inbalancement */
-        addBehaviour(new TickerBehaviour(this, dependencies.inbalancementCheckRefreshFrequency().toMillis()) {
+        addBehaviour(inbalancementChecker());
+
+    }
+
+    @NotNull
+    private TickerBehaviour inbalancementChecker() {
+        final Duration checkFrequency = dependencies.inbalancementCheckRefreshFrequency();
+        final Duration checkInAdvance = dependencies.inbalancementRefreshAdvancement();
+
+        return new TickerBehaviour(this, checkFrequency.toMillis()) {
             @Override
             protected void onTick() {
                 log.info("checking inbalancement");
@@ -85,8 +81,8 @@ public class NetworkAgent extends Agent {
                 log.info("Demand and production: {}", demandAndProduction);
                 if (safetyTresholdNotKept(demandAndProduction)) {
                     final ExpectedInbalancement expectedInbalancement = ExpectedInbalancement.builder()
-                            .since(ZonedDateTime.now())
-                            .until(ZonedDateTime.now().plus(dependencies.inbalancementCheckRefreshFrequency()))
+                            .since(ZonedDateTime.now().plus(checkInAdvance))
+                            .until(ZonedDateTime.now().plus(checkFrequency).plus(checkInAdvance))
                             .expectedDemandAndProduction(demandAndProduction)
                             .build();
 
@@ -110,11 +106,11 @@ public class NetworkAgent extends Agent {
             }
 
             private DemandAndProduction calculateDemandAndProduction() {
-                final long limit = dependencies.inbalancementCheckRefreshFrequency().toMinutes() == 0 ?
-                        1 : dependencies.inbalancementCheckRefreshFrequency().toMinutes();
+                final long limit = checkFrequency.toMinutes() == 0 ?
+                        1 : checkFrequency.toMinutes();
 
-                final double averageDemand = averageBetween(limit, ZonedDateTime.now(), ZonedDateTime.now().plus(dependencies.inbalancementCheckRefreshFrequency()), demandProfile::getDemandInWatts);
-                final double averageProduction = averageBetween(limit, ZonedDateTime.now(), ZonedDateTime.now().plus(dependencies.inbalancementCheckRefreshFrequency()), productionProfile::getProductionInWatts);
+                final double averageDemand = averageBetween(limit, ZonedDateTime.now(), ZonedDateTime.now().plus(checkFrequency), demandProfile::getDemandInWatts);
+                final double averageProduction = averageBetween(limit, ZonedDateTime.now(), ZonedDateTime.now().plus(checkFrequency), productionProfile::getProductionInWatts);
 
                 return new DemandAndProduction(averageDemand, averageProduction);
             }
@@ -138,8 +134,26 @@ public class NetworkAgent extends Agent {
                         .average()
                         .orElse(0);
             }
-        });
+        };
+    }
 
+    @NotNull
+    private TickerBehaviour weatherUpdater() {
+        return new TickerBehaviour(this, dependencies.weatherRefreshDuration().toMillis()) {
+            @Override
+            protected void onTick() {
+                updateWeather();
+            }
+
+            private void updateWeather() {
+                try {
+                    weatherForecast = dependencies.weatherAdapter().getWeatherForecast();
+                    log.info("Forecast refreshed");
+                } catch (final Exception e) {
+                    log.error("Could not update forecast", e);
+                }
+            }
+        };
     }
 
 }

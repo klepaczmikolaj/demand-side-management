@@ -17,4 +17,8 @@ public class ApiError {
     public static ApiError badRequest(final String message) {
         return new ApiError(message, HttpStatus.BAD_REQUEST_400);
     }
+
+    public static ApiError internal(final String message) {
+        return new ApiError(message, HttpStatus.INTERNAL_SERVER_ERROR_500);
+    }
 }

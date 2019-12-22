@@ -19,6 +19,7 @@ public class NetworkAgentDependencies {
     private final Duration demandProfileRefreshFrequency;
     private final Duration productionProfileRefreshFrequency;
     private final Duration inbalancementCheckRefreshFrequency;
+    private final Duration inbalancementRefreshAdvancement;
     private final double safetyTresholdWatts;
     private final Codec codec;
     private final ElectricityProductionProfileCalculator electricityProductionProfileCalculator;

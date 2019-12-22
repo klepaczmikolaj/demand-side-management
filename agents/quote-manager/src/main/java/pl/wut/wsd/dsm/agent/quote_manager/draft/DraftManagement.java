@@ -44,7 +44,7 @@ public class DraftManagement {
 
         if (relatedOffer.isPresent()) {
             final ObligationInDraft obligationInDraft = customerObligation.getObligationType() == ObligationType.INCREASE ?
-                    ObligationInDraft.increase(customerObligation.getKwsIncrease()) : ObligationInDraft.decrease(customerObligation.getKwsDecrease());
+                    ObligationInDraft.increase(customerObligation.getKwsChange()) : ObligationInDraft.decrease(customerObligation.getKwsChange());
             currentDraft.obligationsInDraft.add(obligationInDraft);
 
             return true;

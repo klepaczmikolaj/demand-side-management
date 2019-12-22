@@ -13,8 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CustomerOffer {
     private UUID offerId;
-    private EnergyConsumptionReduction energyConsumptionReduction;
-    private EnergyConsumptionIncrease energyConsumptionIncrease;
+    private EnergyConsumptionChange energyConsumptionChange;
     private BigDecimal pricePerKw;
     private ZonedDateTime validUntil;
+    private ObligationType type;
 }

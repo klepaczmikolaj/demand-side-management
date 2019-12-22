@@ -44,7 +44,7 @@ public class OfferAcceptanceHandler extends ParsingHandler<CustomerObligation, C
     }
 
     private void addObligation(final Offer relatedOffer, final CustomerObligation dto) {
-        final double kws = dto.getObligationType() == ObligationType.INCREASE ? dto.getKwsIncrease() : dto.getKwsIncrease();
+        final double kws = dto.getObligationType() == ObligationType.INCREASE ? dto.getKwsChange() : dto.getKwsChange();
         if (relatedOffer.getObligation() != null) {
             log.error("Offer {} already has obligation", relatedOffer.getOfferId());
             return;

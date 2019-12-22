@@ -13,12 +13,16 @@ import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 
 import static jade.lang.acl.ACLMessage.ACCEPT_PROPOSAL;
 import static jade.lang.acl.ACLMessage.CFP;
+import static jade.lang.acl.ACLMessage.INFORM;
 
 /**
  * Multistep protocol. Describes interactions of all parts involved in customer draft process.
  */
 @Accessors(fluent = true)
 public class CustomerDraftProtocol extends Protocol {
+
+    private final static ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
+
 
     @Getter
     /**
@@ -41,9 +45,12 @@ public class CustomerDraftProtocol extends Protocol {
 
     @Getter
     /**
-     * Client decision passed from customer agent to customer handler.
+     * Client decision passed from customer handle to quote manager.
      */
     private final TargetedStep<CustomerDraftProtocol, CustomerObligation> sendClientDecision;
+
+    @Getter
+    private final InformOfCustomerHandlerAcceptance informOfCustomerHandlerAcceptance;
 
 
     public CustomerDraftProtocol() {
@@ -64,12 +71,11 @@ public class CustomerDraftProtocol extends Protocol {
                 .protocol(this)
                 .build();
 
+        informOfCustomerHandlerAcceptance = new InformOfCustomerHandlerAcceptance(this);
 
     }
 
     public static class SendOfferForHandlerProcessing extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
-        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
-
         private SendOfferForHandlerProcessing(final @NonNull CustomerDraftProtocol protocol) {
             super("Send client offer", CFP, true, CustomerOffer.class, protocol);
         }
@@ -81,8 +87,6 @@ public class CustomerDraftProtocol extends Protocol {
     }
 
     public static class AcceptClientDecision extends ProtocolStep<CustomerDraftProtocol, CustomerObligation> {
-        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
-
         AcceptClientDecision(final @NonNull CustomerDraftProtocol protocol) {
             super("Send client decision", ACCEPT_PROPOSAL, false, CustomerObligation.class, protocol);
         }
@@ -94,10 +98,21 @@ public class CustomerDraftProtocol extends Protocol {
     }
 
     public static class SendCustomerOffer extends ProtocolStep<CustomerDraftProtocol, CustomerOffer> {
-        private final ServiceDescriptionFactory serviceDescriptionFactory = new ServiceDescriptionFactory();
 
         protected SendCustomerOffer(final @NonNull CustomerDraftProtocol protocol) {
             super("Send customer offer", CFP, true, CustomerOffer.class, protocol);
+        }
+
+        public ServiceDescription serviceDescription(final Customer targetCustomer) {
+            return serviceDescriptionFactory
+                    .nameAndProperties("customer-agent", new Property("customerId", targetCustomer.getCustomerId()));
+        }
+    }
+
+    public static class InformOfCustomerHandlerAcceptance extends ProtocolStep<CustomerDraftProtocol, CustomerObligation> {
+
+        protected InformOfCustomerHandlerAcceptance(final CustomerDraftProtocol pro) {
+            super("Inform customer of handler acceptance", INFORM, false, CustomerObligation.class, pro);
         }
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {

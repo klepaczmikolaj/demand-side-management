@@ -1,43 +1,64 @@
 package pl.wut.wsd.dsm.agent.customer_agent.core;
 
+import jade.lang.acl.ACLMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.agent.customer_agent.core.history.ObigationHistoryLocalStore;
+import pl.wut.wsd.dsm.agent.customer_agent.core.history.OfferHistoryLocalStore;
+import pl.wut.wsd.dsm.agent.customer_agent.rest.mapper.ApiTypesMapper;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.ApiError;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.CustomerOfferRepresentation;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationAcceptanceRequest;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationRepresentation;
+import pl.wut.wsd.dsm.infrastructure.codec.Codec;
+import pl.wut.wsd.dsm.infrastructure.common.function.CollectionTransformer;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
+import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
+import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
+import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
+@RequiredArgsConstructor
 public class CustomerObligationService implements ObligationsService, OffersService {
 
-    private boolean hasCurrentObligation;
-    private final List<ObligationRepresentation> obligations = new ArrayList<>();
-    private final List<CustomerOfferRepresentation> offers = new ArrayList<>();
+    private final AgentMessagingCapability messages;
+    private final Codec codec;
+    private final Customer customer;
+    private final ApiTypesMapper mapper;
+    private final CustomerDraftProtocol.AcceptClientDecision acceptClientDecision;
+    private final ObigationHistoryLocalStore obligations;
+    private final OfferHistoryLocalStore offers;
 
     @Override
     public Optional<ObligationRepresentation> getCurrentObligation() {
-
-        return hasCurrentObligation ? Optional.of(obligations.get(obligations.size() - 1)) : Optional.empty();
+        return obligations.getCurrentObligation().map(o -> mapper.toRepresentation(o, offers.findById(o.getRelatedOfferId()).get()));
     }
 
     @Override
     public List<ObligationRepresentation> getObligationHistory() {
-        return new ArrayList<>(obligations);
+        return CollectionTransformer.mapToList(obligations.getHistory(), o -> mapper.toRepresentation(o, offers.findById(o.getRelatedOfferId()).get()));
     }
 
     @Override
     public Result<ObligationRepresentation, ApiError> acceptObligation(final ObligationAcceptanceRequest request) {
-        final Optional<CustomerOfferRepresentation> offer = offers.stream()
-                .filter(o -> o.getOfferId().equals(request.getRelatedOfferId()))
-                .findFirst();
+        final Optional<CustomerOffer> maybeOffer = offers.findById(request.getRelatedOfferId());
 
-        if (offer.isPresent()) {
-            if (offer.get().getOfferEndDateTime().isAfter(ZonedDateTime.now())) {
-                return Result.ok(addObligation(request, offer.get()));
+        if (maybeOffer.isPresent()) {
+            final CustomerOffer relatedOffer = maybeOffer.get();
+            if (relatedOffer.getValidUntil().isAfter(ZonedDateTime.now())) {
+
+                final ACLMessage message = acceptClientDecision.templatedMessage();
+                final CustomerObligation customerObligation = mapper.toObligation(request, relatedOffer);
+                message.setContent(codec.encode(customerObligation));
+                messages.send(message, acceptClientDecision.serviceDescription(customer));
+
+                return Result.ok(mapper.toRepresentation(customerObligation, relatedOffer));
             } else {
                 return Result.error(ApiError.badRequest("Offer has expired"));
             }
@@ -47,48 +68,18 @@ public class CustomerObligationService implements ObligationsService, OffersServ
 
     }
 
-    private ObligationRepresentation addObligation(final ObligationAcceptanceRequest request, final CustomerOfferRepresentation offer) {
-        final ObligationRepresentation representation = new ObligationRepresentation();
-        representation.setAvailable(true);
-        representation.setObligationSizeKw(request.getKwsAccepted());
-        representation.setRelatedOfferId(offer.getOfferId());
-        representation.setSince(offer.getDemandChangeStart());
-        representation.setUntil(offer.getDemandChangeEnd());
-        obligations.add(representation);
-        hasCurrentObligation = true;
-
-        return representation;
-    }
-
     @Override
     public Optional<CustomerOfferRepresentation> getCurrentOffer() {
-        if (!offers.isEmpty() && offers.get(offers.size() - 1).getOfferEndDateTime().isAfter(ZonedDateTime.now())) {
-            return Optional.of(offers.get(offers.size() - 1));
-        } else {
-            return Optional.empty();
-        }
+        return offers.getCurrentOffer().map(mapper::toRepresentation);
     }
 
     @Override
     public List<CustomerOfferRepresentation> getOfferHistory() {
-        return new ArrayList<>(offers);
+        return CollectionTransformer.mapToList(offers.getHistory(), mapper::toRepresentation);
     }
 
     @Override
     public void registerOffer(final CustomerOffer offer) {
-        final CustomerOfferRepresentation representation = new CustomerOfferRepresentation();
-        representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
-        Optional.ofNullable(offer.getEnergyConsumptionReduction()).ifPresent(r -> {
-            representation.setReducedKws(r.getSizeKws());
-            representation.setDemandChangeStart(r.getSince());
-            representation.setDemandChangeEnd(r.getUntil());
-        });
-        Optional.ofNullable(offer.getEnergyConsumptionIncrease()).ifPresent(i -> {
-            representation.setReducedKws(i.getAvailKws());
-            representation.setDemandChangeStart(i.getSince());
-            representation.setDemandChangeEnd(i.getUntil());
-        });
-        representation.setOfferEndDateTime(offer.getValidUntil());
-        offers.add(representation);
+        offers.registerCurrentOffer(offer);
     }
 }
