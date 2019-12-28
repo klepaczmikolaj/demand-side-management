@@ -1,0 +1,24 @@
+CREATE TABLE customer_trust
+(
+  id            bigint(20)     NOT NULL AUTO_INCREMENT,
+  customer_id   bigint(20)     NOT NULL UNIQUE,
+  current_value decimal(10, 2) NOT NULL,
+  kws_processed decimal(10, 2) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE refresh_details
+(
+  id           bigint(20) NOT NULL AUTO_INCREMENT,
+  last_refresh TIMESTAMP  NOT NULL,
+  primary key (id)
+);
+# CREATE TABLE `obligation`
+# (
+#   `id`              bigint(20)     NOT NULL AUTO_INCREMENT,
+#   `CUSTOMER_ID`     varchar(32)    NOT NULL,
+#   `STATE`           varchar(25)    NOT NULL,
+#   `SIZE`            decimal(10, 2) NOT NULL,
+#   `PERCENTAGE_KEPT` decimal(10, 2) NOT NULL,
+#   PRIMARY KEY (`id`)
+# )

@@ -1,0 +1,147 @@
+{
+  "info": {
+    "_postman_id": "1ac2e074-3295-4a69-ae67-1627c539180b",
+    "name": "WSD_Customer_API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GetSettings",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}settings",
+          "host": [
+            "{{host}}settings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UpdateSettings",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"minimalProfit\": 15.0\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{host}}settings",
+          "host": [
+            "{{host}}settings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetDevices",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}devices",
+          "host": [
+            "{{host}}devices"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SwitchDevice",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{host}}devices/3/off",
+          "host": [
+            "{{host}}devices"
+          ],
+          "path": [
+            "3",
+            "off"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetOffers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}offers",
+          "host": [
+            "{{host}}offers"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetCurrentOffer",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{host}}offers/current",
+          "host": [
+            "{{host}}offers"
+          ],
+          "path": [
+            "current"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "f3729aeb-1822-447e-a738-5803feac385c",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "13cf7e1f-e91e-48c8-898f-4ce9927c1273",
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "6103db39-21c8-43b9-b50e-ddbef753c87e",
+      "key": "host",
+      "value": "http://localhost:65436/",
+      "type": "string"
+    }
+  ],
+  "protocolProfileBehavior": {}
+}
