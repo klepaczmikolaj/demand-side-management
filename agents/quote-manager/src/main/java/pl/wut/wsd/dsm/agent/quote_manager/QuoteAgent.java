@@ -57,6 +57,8 @@ public class QuoteAgent extends Agent {
         final QuoteAgentDependencies dependencies = (QuoteAgentDependencies) getArguments()[0];
         this.codec = dependencies.codec();
         this.addBehaviour(messageHandler);
+        this.addBehaviour(new UpdatesNetworkAdvisorWithDraftInfo(codec, draftManagement, this, serviceDiscovery));
+
         registerToWhitepages();
     }
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 public class DraftManagement {
@@ -24,7 +25,7 @@ public class DraftManagement {
 
     public void startNewDraft(final ZonedDateTime since, final ZonedDateTime to) {
         Optional.ofNullable(currentDraft).ifPresent(oldDrafts::add);
-        currentDraft = new Draft(since, since, to);
+        currentDraft = new Draft(UUID.randomUUID(), since, since, to);
     }
 
     public void registerClientOffers(final Set<CustomerOffer> customerOffer) {
@@ -61,8 +62,11 @@ public class DraftManagement {
     public DraftSummaryStatistics getSummaryStatistics() {
         ensureCurrentDraftInitialized();
         return DraftSummaryStatistics.builder()
+
                 .totalObligationDecrease(CollectionTransformer.summing(currentDraft.obligationsInDraft, ObligationInDraft::getKwsReduction))
                 .totalObligationIncrease(CollectionTransformer.summing(currentDraft.obligationsInDraft, ObligationInDraft::getKwsIncrease))
+                .since(currentDraft.demandChangeSince)
+                .until(currentDraft.demandChangeEnd)
                 .build();
     }
 

@@ -35,6 +35,7 @@ public class SystemDraftProtocol extends Protocol {
      * After quote manager starts draft it should periodically update network advisory with draft details
      * using this information network advisor can adjust demand profile.
      */
+    @Getter
     private TargetedStep<SystemDraftProtocol, DraftSummary> updateWithDraftSummary =
             TargetedStep.<SystemDraftProtocol, DraftSummary>targetedBuilder()
                     .stepName("Update network advisory with current draft status")
