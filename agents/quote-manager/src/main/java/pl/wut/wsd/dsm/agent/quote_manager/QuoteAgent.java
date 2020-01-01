@@ -17,6 +17,7 @@ import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.OneShotMessageSpec;
+import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionChange;
@@ -50,6 +51,7 @@ public class QuoteAgent extends Agent {
             MessageSpecification.of(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().toMessageTemplate(), this::processInbalancement)
     ));
     private final DraftManagement draftManagement = new DraftManagement();
+    private final AgentMessagingCapability messagingCapability = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
 
     @Override
     protected void setup() {
@@ -72,30 +74,18 @@ public class QuoteAgent extends Agent {
             log.error("Could not decode incoming message {}", decodingResult.error());
         } else {
             final ExpectedInbalancement inbalancement = decodingResult.result();
-            final Result<List<DFAgentDescription>, FIPAException> trustServiceSearchResult = serviceDiscovery.findServices(GetCustomerTrustProtocol.customerTrustRequest.getTargetService());
 
-            if (trustServiceSearchResult.isError()) {
-                log.error("DF search error", trustServiceSearchResult.error());
-            } else if (trustServiceSearchResult.result().isEmpty()) {
-                log.info("No trust service found");
-            } else {
-                draftManagement.startNewDraft(inbalancement.getSince(), inbalancement.getUntil());
-                final DFAgentDescription trustServiceAgent = trustServiceSearchResult.result().get(0);
+            draftManagement.startNewDraft(inbalancement.getSince(), inbalancement.getUntil());
 
-                final ACLMessage trustRequest = GetCustomerTrustProtocol.customerTrustRequest.templatedMessage();
-                final GetTrustRankingRequest getTrustRankingRequest = new GetTrustRankingRequest();
-                getTrustRankingRequest.setFrom(0);
-                getTrustRankingRequest.setTo(Integer.MAX_VALUE);
-                getTrustRankingRequest.setSelectionType(GetTrustRankingRequest.SelectionType.REGULAR);
+            final ACLMessage trustRequest = GetCustomerTrustProtocol.customerTrustRequest.templatedMessage();
+            trustRequest.setContent(codec.encode(GetTrustRankingRequest.requestWholeRanking()));
+            trustRequest.setConversationId(UUID.randomUUID().toString());
 
-                trustRequest.setContent(codec.encode(getTrustRankingRequest));
-                trustRequest.addReceiver(trustServiceAgent.getName());
-                trustRequest.setConversationId(UUID.randomUUID().toString());
+            messagingCapability.send(trustRequest, GetCustomerTrustProtocol.customerTrustRequest.getTargetService());
 
-                log.info("Sending message to trust agent", trustRequest);
-                send(trustRequest);
-                registerResponseHandler(trustRequest.getConversationId(), GetCustomerTrustProtocol.customerTrustRankingResponse.toMessageTemplate(), message -> continueProcessAfterTrustResponse(message, inbalancement));
-            }
+            log.info("Sending message to trust agent", trustRequest);
+
+            registerResponseHandler(trustRequest.getConversationId(), GetCustomerTrustProtocol.customerTrustRankingResponse.toMessageTemplate(), message -> continueProcessAfterTrustResponse(message, inbalancement));
         }
     }
 
