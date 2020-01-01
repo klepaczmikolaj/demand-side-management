@@ -41,7 +41,7 @@ public class DefaultElectricityProductionProfileCalculator implements Electricit
 
         return Optional.ofNullable(cloudiness)
                 .map(Cloudiness::getPercentage)
-                .map(percentage -> solarPower * (1 - percentage))
+                .map(percentage -> solarPower * (1 - percentage / 100))
                 .map(Double::longValue)
                 .map(BigInteger::valueOf)
                 .orElseGet(() -> BigInteger.valueOf((long) solarPower / 5));
@@ -50,10 +50,10 @@ public class DefaultElectricityProductionProfileCalculator implements Electricit
 
     private BigInteger windPowerProduction(final Wind wind) {
         final double speed = wind.getSpeed();
-        if (speed < 1 || speed > 35) {
+        if (speed < 1 || speed > 30) {
             return BigInteger.ZERO;
         }
 
-        return BigInteger.valueOf((long) (windPower * wind.getSpeed() / 35));
+        return BigInteger.valueOf((long) (windPower * wind.getSpeed() / 30));
     }
 }
