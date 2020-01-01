@@ -1,7 +1,7 @@
 package pl.wut.wsd.dsm.agent.quote_manager;
 
+import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
@@ -9,6 +9,7 @@ import jade.lang.acl.MessageTemplate;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.quote_manager.draft.DraftManagement;
+import pl.wut.wsd.dsm.agent.quote_manager.offer.OfferPreparer;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
@@ -20,8 +21,6 @@ import pl.wut.wsd.dsm.infrastructure.messaging.OneShotMessageSpec;
 import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionChange;
-import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
 import pl.wut.wsd.dsm.ontology.trust.CustomerTrustRanking;
 import pl.wut.wsd.dsm.ontology.trust.CustomerTrustRankingEntry;
@@ -30,14 +29,13 @@ import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import pl.wut.wsd.dsm.protocol.SystemDraftProtocol;
 import pl.wut.wsd.dsm.protocol.customer_trust.GetCustomerTrustProtocol;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class QuoteAgent extends Agent {
@@ -52,6 +50,7 @@ public class QuoteAgent extends Agent {
     ));
     private final DraftManagement draftManagement = new DraftManagement();
     private final AgentMessagingCapability messagingCapability = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
+    private final OfferPreparer offerPreparer = new OfferPreparer();
 
     @Override
     protected void setup() {
@@ -70,7 +69,7 @@ public class QuoteAgent extends Agent {
         final Class<ExpectedInbalancement> messageClass = systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getMessageClass();
         final Result<ExpectedInbalancement, DecodingError> decodingResult = codec.decode(aclMessage.getContent(), messageClass);
 
-        if (!decodingResult.isValid()) {
+        if (decodingResult.isError()) {
             log.error("Could not decode incoming message {}", decodingResult.error());
         } else {
             final ExpectedInbalancement inbalancement = decodingResult.result();
@@ -97,7 +96,7 @@ public class QuoteAgent extends Agent {
             log.error("Could not decode trust response", decodingResult.error());
         } else {
             final List<CustomerTrustRankingEntry> ranking = decodingResult.result().getRankingEntries();
-            final Map<Long, CustomerOffer> offerByCustomerId = prepareCustomerOffers(ranking, expectedInbalancement);
+            final Map<Long, CustomerOffer> offerByCustomerId = offerPreparer.prepareCustomerOffers(ranking, expectedInbalancement);
 
             draftManagement.registerClientOffers(new HashSet<>(offerByCustomerId.values()));
 
@@ -107,40 +106,16 @@ public class QuoteAgent extends Agent {
 
     private void sendCustomerOffer(final Long customerId, final CustomerOffer customerOffer) {
         final ServiceDescription customerService = customerDraftProtocol.sendOfferToHandler().serviceDescription(new Customer(customerId));
-        final Result<List<DFAgentDescription>, FIPAException> searchResult = serviceDiscovery.findServices(customerService);
-        if (searchResult.isValid()) {
-            if (!searchResult.result().isEmpty()) {
-                final ACLMessage message = customerDraftProtocol.sendOfferToHandler().templatedMessage();
-                message.setConversationId(UUID.randomUUID().toString());
-                message.setContent(codec.encode(customerOffer));
-                message.addReceiver(searchResult.result().get(0).getName());
-                registerResponseHandler(message.getConversationId(), customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse);
-                send(message);
-                log.info("Customer offer sent");
-            }
+        final ACLMessage message = customerDraftProtocol.sendOfferToHandler().templatedMessage();
+        message.setConversationId(UUID.randomUUID().toString());
+        message.setContent(codec.encode(customerOffer));
+        final Result<Set<AID>, FIPAException> sendResult = messagingCapability.send(message, customerService);
+        if (sendResult.isValid()) {
+            log.info("Sent customer offer to customer {}", customerId);
+            registerResponseHandler(message.getConversationId(), customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse);
         } else {
-            log.error("Could not send customer offer to customer {}, because {}", customerId, searchResult.error().getMessage());
+            log.info("Could not send customer offer {}", sendResult.error().getMessage());
         }
-    }
-
-    private Map<Long, CustomerOffer> prepareCustomerOffers(final List<CustomerTrustRankingEntry> ranking, final ExpectedInbalancement expectedInbalancement) {
-        return ranking.stream().collect(Collectors.toMap(e -> e.getCustomer().getCustomerId(), e -> {
-            final double wattsDemand = expectedInbalancement.getExpectedDemandAndProduction().getWattsDemand();
-            final double wattsProduction = expectedInbalancement.getExpectedDemandAndProduction().getWattsProduction();
-            final CustomerOffer customerOffer = new CustomerOffer();
-            customerOffer.setOfferId(UUID.randomUUID());
-            customerOffer.setPricePerKw(BigDecimal.ONE);
-            customerOffer.setValidUntil(expectedInbalancement.getSince());
-            if (wattsDemand > wattsProduction) {
-                customerOffer.setType(ObligationType.INCREASE);
-            } else {
-                customerOffer.setType(ObligationType.REDUCTION);
-            }
-            customerOffer.setEnergyConsumptionChange(
-                    new EnergyConsumptionChange(Math.abs((wattsDemand - wattsProduction)) / ranking.size(), expectedInbalancement.getSince(), expectedInbalancement.getUntil())
-            );
-            return customerOffer;
-        }));
     }
 
     private void processClientResponse(final ACLMessage message) {
