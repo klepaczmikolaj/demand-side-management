@@ -27,7 +27,7 @@ public final class ObigationHistoryLocalStore {
     }
 
     public Optional<CustomerObligation> getCurrentObligation() {
-        return hasCurrent ? Optional.empty() : CollectionTransformer.lastElement(obligations);
+        return !hasCurrent ? Optional.empty() : CollectionTransformer.lastElement(obligations);
     }
 
     public List<CustomerObligation> getHistory() {

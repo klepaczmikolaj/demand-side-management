@@ -28,12 +28,16 @@ class DefaultMessagingCapability implements AgentMessagingCapability {
             return Result.error(searchResult.error());
         }
 
-        return searchResult.mapResult(list -> {
+        final Result<Set<AID>, FIPAException> result = searchResult.mapResult(list -> {
             final List<AID> aids = CollectionTransformer.mapToList(list, DFAgentDescription::getName);
             aids.forEach(aclMessage::addReceiver);
 
             return new HashSet<>(aids);
         });
+
+        agent.send(aclMessage);
+
+        return result;
 
     }
 

@@ -1,15 +1,20 @@
 package pl.wut.wsd.dsm.agent.customer_handler.handler;
 
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
+import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation;
 import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerObligationRepository;
 import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerOfferRepository;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.handle.ParsingHandler;
+import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
+import pl.wut.wsd.dsm.protocol.TargetedStep;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -20,11 +25,18 @@ public class OfferAcceptanceHandler extends ParsingHandler<CustomerObligation, C
 
     private final CustomerOfferRepository customerOfferRepository;
     private final CustomerObligationRepository obligationRepository;
+    private final AgentMessagingCapability messages;
+    private final CustomerDraftProtocol.InformOfCustomerHandlerAcceptance informCustomer;
+    private final TargetedStep<CustomerDraftProtocol, CustomerObligation> sendClientDecision;
 
-    public OfferAcceptanceHandler(final Codec codec, final CustomerDraftProtocol.AcceptClientDecision protocolStep, final CustomerOfferRepository customerOfferRepository, final CustomerObligationRepository obligationRepository) {
+
+    public OfferAcceptanceHandler(final Codec codec, final CustomerDraftProtocol.AcceptClientDecision protocolStep, final CustomerOfferRepository customerOfferRepository, final CustomerObligationRepository obligationRepository, final AgentMessagingCapability messages, final CustomerDraftProtocol.InformOfCustomerHandlerAcceptance informCustomer) {
         super(codec, protocolStep);
         this.customerOfferRepository = customerOfferRepository;
         this.obligationRepository = obligationRepository;
+        this.messages = messages;
+        this.informCustomer = informCustomer;
+        this.sendClientDecision = informCustomer.getProtocol().sendClientDecision();
     }
 
     @Override
@@ -49,7 +61,25 @@ public class OfferAcceptanceHandler extends ParsingHandler<CustomerObligation, C
             log.error("Offer {} already has obligation", relatedOffer.getOfferId());
             return;
         }
-        final Obligation obligation = Obligation.newObligation(relatedOffer.getCustomerId(), kws, relatedOffer);
+        final Long customerId = relatedOffer.getCustomerId();
+        final Obligation obligation = Obligation.newObligation(customerId, kws, relatedOffer);
         obligationRepository.saveOrUpdate(obligation);
+
+        informCustomer(dto, customerId);
+        informQuoteManager(dto);
+    }
+
+    private void informCustomer(final CustomerObligation dto, final Long customerId) {
+        final ServiceDescription serviceDescription = informCustomer.serviceDescription(new Customer(customerId));
+        final ACLMessage message = informCustomer.templatedMessage();
+        message.setContent(codec.encode(dto));
+        messages.send(message, serviceDescription);
+    }
+
+    private void informQuoteManager(final CustomerObligation dto) {
+        final ServiceDescription quoteManager = sendClientDecision.getTargetService();
+        final ACLMessage aclMessage = informCustomer.templatedMessage();
+        aclMessage.setContent(codec.encode(dto));
+        messages.send(aclMessage, quoteManager);
     }
 }

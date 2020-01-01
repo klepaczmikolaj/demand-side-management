@@ -18,9 +18,13 @@ public class DraftManagement {
     private Draft currentDraft;
     private List<Draft> oldDrafts = new ArrayList<>();
 
+    public boolean currentDraftStillInProgress() {
+        return currentDraft != null && currentDraft.draftEnd.isAfter(ZonedDateTime.now());
+    }
+
     public void startNewDraft(final ZonedDateTime since, final ZonedDateTime to) {
         Optional.ofNullable(currentDraft).ifPresent(oldDrafts::add);
-        currentDraft = new Draft(since, to);
+        currentDraft = new Draft(since, since, to);
     }
 
     public void registerClientOffers(final Set<CustomerOffer> customerOffer) {

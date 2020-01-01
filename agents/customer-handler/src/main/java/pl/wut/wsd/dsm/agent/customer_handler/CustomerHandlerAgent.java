@@ -15,6 +15,7 @@ import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
+import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
 import java.time.Duration;
@@ -35,9 +36,10 @@ public class CustomerHandlerAgent extends Agent {
         final CustomerOfferRepository offerRepo = dependencies.getCustomerOfferRepository();
         final Codec codec = dependencies.getCodec();
         final CustomerHandlerTypesMapper mapper = new CustomerHandlerTypesMapper();
+        final AgentMessagingCapability messaging = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
 
         final CustomerOfferHandler customerOfferHandler = new CustomerOfferHandler(codec, new CustomerDraftProtocol().sendCustomerOffer(), this, serviceDiscovery, offerRepo, mapper);
-        final OfferAcceptanceHandler offerAcceptanceHandler = new OfferAcceptanceHandler(codec, customerDraftProtocol.acceptClientDecision(), offerRepo, obligationRepo);
+        final OfferAcceptanceHandler offerAcceptanceHandler = new OfferAcceptanceHandler(codec, customerDraftProtocol.acceptClientDecision(), offerRepo, obligationRepo, messaging, customerDraftProtocol.informOfCustomerHandlerAcceptance());
 
         this.addBehaviour(
                 new MessageHandler(this,

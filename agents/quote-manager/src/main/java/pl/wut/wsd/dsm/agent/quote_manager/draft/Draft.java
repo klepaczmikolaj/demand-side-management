@@ -11,6 +11,7 @@ import java.util.Set;
 class Draft {
     final Set<ObligationInDraft> obligationsInDraft = new HashSet<>();
     final Set<CustomerOffer> customerOffers = new HashSet<>();
-    private final ZonedDateTime start;
-    private final ZonedDateTime end;
+    final ZonedDateTime draftEnd;
+    final ZonedDateTime demandChangeSince;
+    final ZonedDateTime demandChangeEnd;
 }

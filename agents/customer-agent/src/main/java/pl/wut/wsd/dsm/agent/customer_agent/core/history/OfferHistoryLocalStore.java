@@ -27,7 +27,7 @@ public final class OfferHistoryLocalStore {
     }
 
     public Optional<CustomerOffer> getCurrentOffer() {
-        return hasCurrent ? Optional.empty() : CollectionTransformer.lastElement(offers);
+        return !hasCurrent ? Optional.empty() : CollectionTransformer.lastElement(offers);
     }
 
     public Optional<CustomerOffer> findById(final UUID id) {

@@ -82,7 +82,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {
             return serviceDescriptionFactory.
-                    nameAndProperties("customer-handler", new Property("customerId", targetCustomer.getCustomerId()));
+                    nameAndProperties("customer-handler-offer-processing", new Property("customerId", targetCustomer.getCustomerId()));
         }
     }
 
@@ -93,7 +93,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {
             return serviceDescriptionFactory
-                    .nameAndProperties("customer-handler", new Property("customerId", targetCustomer.getCustomerId()));
+                    .nameAndProperties("customer-handler-decision-acceptance", new Property("customerId", targetCustomer.getCustomerId()));
         }
     }
 
@@ -105,7 +105,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {
             return serviceDescriptionFactory
-                    .nameAndProperties("customer-agent", new Property("customerId", targetCustomer.getCustomerId()));
+                    .nameAndProperties("customer-agent-offer-processing", new Property("customerId", targetCustomer.getCustomerId()));
         }
     }
 
@@ -117,7 +117,7 @@ public class CustomerDraftProtocol extends Protocol {
 
         public ServiceDescription serviceDescription(final Customer targetCustomer) {
             return serviceDescriptionFactory
-                    .nameAndProperties("customer-agent", new Property("customerId", targetCustomer.getCustomerId()));
+                    .nameAndProperties("customer-agent-acceptance-information", new Property("customerId", targetCustomer.getCustomerId()));
         }
     }
 }

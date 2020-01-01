@@ -1,5 +1,7 @@
 package pl.wut.wsd.dsm.agent.customer_agent.core;
 
+import jade.core.AID;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,9 +59,8 @@ public class CustomerObligationService implements ObligationsService, OffersServ
                 final ACLMessage message = acceptClientDecision.templatedMessage();
                 final CustomerObligation customerObligation = mapper.toObligation(request, relatedOffer);
                 message.setContent(codec.encode(customerObligation));
-                messages.send(message, acceptClientDecision.serviceDescription(customer));
-
-                return Result.ok(mapper.toRepresentation(customerObligation, relatedOffer));
+                final Result<Set<AID>, FIPAException> sendResult = messages.send(message, acceptClientDecision.serviceDescription(customer));
+                return sendResult.isValid() ? Result.ok(mapper.toRepresentation(customerObligation, relatedOffer)) : Result.error(ApiError.internal(sendResult.error().getMessage()));
             } else {
                 return Result.error(ApiError.badRequest("Offer has expired"));
             }

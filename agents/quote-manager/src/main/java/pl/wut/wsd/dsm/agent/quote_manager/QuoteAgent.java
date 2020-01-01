@@ -1,7 +1,6 @@
 package pl.wut.wsd.dsm.agent.quote_manager;
 
 import jade.core.Agent;
-import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
@@ -14,6 +13,7 @@ import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.OneShotMessageSpec;
@@ -30,6 +30,7 @@ import pl.wut.wsd.dsm.protocol.SystemDraftProtocol;
 import pl.wut.wsd.dsm.protocol.customer_trust.GetCustomerTrustProtocol;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class QuoteAgent extends Agent {
     private final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
     private final MessageHandler messageHandler = (new MessageHandler(this,
             MessageSpecification.of(customerDraftProtocol.sendClientDecision().toMessageTemplate(), this::processClientResponse),
-            MessageSpecification.of(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().toMessageTemplate(), this::processNewDraft)
+            MessageSpecification.of(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().toMessageTemplate(), this::processInbalancement)
     ));
     private final DraftManagement draftManagement = new DraftManagement();
 
@@ -58,7 +59,12 @@ public class QuoteAgent extends Agent {
         registerToWhitepages();
     }
 
-    private void processNewDraft(final ACLMessage aclMessage) {
+    private void processInbalancement(final ACLMessage aclMessage) {
+        if (draftManagement.currentDraftStillInProgress()) {
+            log.info("Current draft is still in progress, new draft wont be started, current: {}", draftManagement.getSummaryStatistics());
+            return;
+        }
+
         final Class<ExpectedInbalancement> messageClass = systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getMessageClass();
         final Result<ExpectedInbalancement, DecodingError> decodingResult = codec.decode(aclMessage.getContent(), messageClass);
 
@@ -105,11 +111,11 @@ public class QuoteAgent extends Agent {
 
             draftManagement.registerClientOffers(new HashSet<>(offerByCustomerId.values()));
 
-            offerByCustomerId.forEach(this::SendCustomerOffer);
+            offerByCustomerId.forEach(this::sendCustomerOffer);
         }
     }
 
-    private void SendCustomerOffer(final Long customerId, final CustomerOffer customerOffer) {
+    private void sendCustomerOffer(final Long customerId, final CustomerOffer customerOffer) {
         final ServiceDescription customerService = customerDraftProtocol.sendOfferToHandler().serviceDescription(new Customer(customerId));
         final Result<List<DFAgentDescription>, FIPAException> searchResult = serviceDiscovery.findServices(customerService);
         if (searchResult.isValid()) {
@@ -159,14 +165,9 @@ public class QuoteAgent extends Agent {
     }
 
     private void registerToWhitepages() {
-        final DFAgentDescription dfAgentDescription = new DFAgentDescription();
-        dfAgentDescription.addServices(customerDraftProtocol.sendClientDecision().getTargetService());
-        dfAgentDescription.addServices(systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getTargetService());
-        try {
-            DFService.register(this, dfAgentDescription);
-        } catch (final FIPAException e) {
-            log.error("Could not register to whitepages", e);
-        }
+        new ServiceRegistration(this).registerRetryOnFailure(Duration.ofSeconds(3),
+                customerDraftProtocol.sendClientDecision().getTargetService(),
+                systemDraftProtocol.informQuoteManagerOfExpectedInbalancement().getTargetService());
     }
 
     private void registerResponseHandler(final String conversationId, final MessageTemplate messageTemplate, final Consumer<ACLMessage> responseHandler) {

@@ -37,7 +37,6 @@ public class ServiceRegistration {
 
     public void registerRetryOnFailure(final Duration retryInterval, final ServiceDescription... serviceDescriptions) {
         final Optional<FIPAException> maybeException = register(serviceDescriptions);
-
         if (maybeException.isPresent()) {
             log.error("Could not register to whitepages, retry in: " + retryInterval, maybeException.get());
             agent.addBehaviour(new WakerBehaviour(agent, retryInterval.toMillis()) {

@@ -10,6 +10,10 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
+    <logger name="org.eclipse.jetty" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
     <!--<logger name="org.hibernate.type" level="TRACE" additivity="false">-->
