@@ -8,11 +8,14 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import pl.wut.wsd.dsm.agent.network_advisor.domain.ElectrictyDemandCalculatorWithDraftUpdater;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.profile.ElectricityDemandProfile;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.profile.ElectricityProductionProfile;
 import pl.wut.wsd.dsm.agent.network_advisor.weather.model.WeatherForecast;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
+import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.ontology.network.DemandAndProduction;
 import pl.wut.wsd.dsm.ontology.network.ExpectedInbalancement;
 import pl.wut.wsd.dsm.protocol.SystemDraftProtocol;
@@ -64,7 +67,12 @@ public class NetworkAgent extends Agent {
 
         /* Inform quote manager of inbalancement */
         addBehaviour(inbalancementChecker());
-
+        final ElectrictyDemandCalculatorWithDraftUpdater updater = new ElectrictyDemandCalculatorWithDraftUpdater(dependencies.codec(),
+                systemDraftProtocol.updateWithDraftSummary(),
+                dependencies.electricityDemandProfileCalculator());
+        addBehaviour(new MessageHandler(this, MessageSpecification.of(
+                systemDraftProtocol.updateWithDraftSummary().toMessageTemplate(),
+                updater::handle)));
     }
 
     @NotNull
