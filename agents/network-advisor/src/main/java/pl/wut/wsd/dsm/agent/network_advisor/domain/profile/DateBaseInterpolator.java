@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public abstract class DateBaseInterpolator<T extends Number> {
 
-    private final Map<ZonedDateTime, T> measurements;
+    protected final Map<ZonedDateTime, T> measurements;
 
     protected double getAt(final ZonedDateTime at) {
         final Set<ZonedDateTime> dates = measurements.keySet();

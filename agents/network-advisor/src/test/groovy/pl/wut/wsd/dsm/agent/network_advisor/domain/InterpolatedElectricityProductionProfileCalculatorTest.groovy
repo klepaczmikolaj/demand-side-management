@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 import java.time.ZonedDateTime
 
-class DefaultElectricityProductionProfileCalculatorTest extends Specification {
+class InterpolatedElectricityProductionProfileCalculatorTest extends Specification {
 
     private static final double solarPower = 10
     private static final double windPower = 20
