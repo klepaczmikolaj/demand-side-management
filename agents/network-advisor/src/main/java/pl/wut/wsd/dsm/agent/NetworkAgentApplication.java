@@ -5,6 +5,8 @@ import jade.wrapper.ControllerException;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.wsd.dsm.agent.network_advisor.NetworkAgent;
 import pl.wut.wsd.dsm.agent.network_advisor.NetworkAgentDependencies;
+import pl.wut.wsd.dsm.agent.network_advisor.domain.DefaultElectricityDemandProfileCalculator;
+import pl.wut.wsd.dsm.agent.network_advisor.domain.DefaultElectricityProductionProfileCalculator;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.ElectricityDemandProfileCalculator;
 import pl.wut.wsd.dsm.agent.network_advisor.domain.ElectricityProductionProfileCalculator;
 import pl.wut.wsd.dsm.agent.network_advisor.infrastructure.rest.RestClient;
@@ -12,7 +14,6 @@ import pl.wut.wsd.dsm.agent.network_advisor.weather.WeatherAdapter;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
 
-import java.math.BigInteger;
 import java.time.Duration;
 
 @Slf4j
@@ -28,8 +29,8 @@ public class NetworkAgentApplication {
     private static final Duration inbalancementCheckRefresFrequency = Duration.ofMinutes(1);
     private static final Duration inbalancementCheckAdvancement = Duration.ofHours(1);
     private static final double safetyTreshold = 50;
-    private static final ElectricityDemandProfileCalculator demandCalc = forecast -> time -> BigInteger.TEN;
-    private static final ElectricityProductionProfileCalculator productionCalc = forecast -> time -> BigInteger.valueOf(50L);
+    private static final ElectricityDemandProfileCalculator demandCalc = new DefaultElectricityDemandProfileCalculator(15, 10000);
+    private static final ElectricityProductionProfileCalculator productionCalc = new DefaultElectricityProductionProfileCalculator(65000, 150000);
     /* ------------------------------------------------------------------------------------- */
 
     public static void main(final String[] args) throws ControllerException {

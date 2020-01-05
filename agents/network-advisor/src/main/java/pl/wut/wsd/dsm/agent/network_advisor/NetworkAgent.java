@@ -14,6 +14,7 @@ import pl.wut.wsd.dsm.agent.network_advisor.domain.profile.ElectricityProduction
 import pl.wut.wsd.dsm.agent.network_advisor.weather.model.WeatherForecast;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.ontology.network.DemandAndProduction;
@@ -73,6 +74,7 @@ public class NetworkAgent extends Agent {
         addBehaviour(new MessageHandler(this, MessageSpecification.of(
                 systemDraftProtocol.updateWithDraftSummary().toMessageTemplate(),
                 updater::handle)));
+        new ServiceRegistration(this).registerRetryOnFailure(Duration.ofSeconds(5), systemDraftProtocol.updateWithDraftSummary().getTargetService());
     }
 
     @NotNull

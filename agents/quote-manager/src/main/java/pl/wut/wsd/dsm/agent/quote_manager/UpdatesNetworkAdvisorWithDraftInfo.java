@@ -25,7 +25,7 @@ public class UpdatesNetworkAdvisorWithDraftInfo extends TickerBehaviour {
     private final TargetedStep<SystemDraftProtocol, DraftSummary> step = new SystemDraftProtocol().updateWithDraftSummary();
 
     public UpdatesNetworkAdvisorWithDraftInfo(final Codec codec, final DraftManagement draftManagement, final Agent a, final ServiceDiscovery serviceDiscovery) {
-        super(a, Duration.ofSeconds(2).toMillis());
+        super(a, Duration.ofSeconds(20).toMillis());
         this.codec = codec;
         this.draftManagement = draftManagement;
         this.messagingCapability = AgentMessagingCapability.defaultCapability(serviceDiscovery, a);
@@ -34,7 +34,7 @@ public class UpdatesNetworkAdvisorWithDraftInfo extends TickerBehaviour {
     @Override
     protected void onTick() {
         if (!draftManagement.currentDraftStillInProgress()) {
-            log.info("Not current draft found, no need to update network advisor");
+            log.info("No current draft found, no need to update network advisor");
             return;
         }
         final ServiceDescription targetService = step.getTargetService();
