@@ -39,6 +39,7 @@ public class GatewayAgentApplication {
                 ctx.result("Api for customer: " + customerId + " not found");
             }
         });
+        api.get("/health", ctx -> ctx.status(200).result("ok"));
         final AgentContainer container = agentStartupManager.startChildContainer(AgentStartupInfoImpl.builder()
                 .platformId("wsd-dsm")
                 .containerName("gateway-agent-container")
