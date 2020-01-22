@@ -16,50 +16,56 @@ public class ApiInitializer {
     final Codec codec = Codec.json();
 
     public void initialize(final Javalin javalin, final CustomerAgentApiHandle customerAgentApiHandle) {
-        javalin.get("/", ctx -> ctx.result("Hello, customer agent speaking, how can I help you bro"));
+        final int cid = customerAgentApiHandle.getCustomerCid();
 
-        javalin.post("/obligation", ctx -> {
+        javalin.get(prependCid(cid, "/"), ctx -> ctx.result("Hello, customer agent speaking, how can I help you bro"));
+
+        javalin.post(prependCid(cid, "/obligation"), ctx -> {
             final Result<ObligationRepresentation, ApiError> result = parseBody(ObligationAcceptanceRequest.class, ctx.body())
                     .flatMap(customerAgentApiHandle::postObligation);
             respond(result, ctx);
         });
 
         // Wrzucenie tokenu do wiadomości push
-        javalin.post("/pushToken", ctx -> {
+        javalin.post(prependCid(cid, "/pushToken"), ctx -> {
             final String token = ctx.body();
 
         });
 
-        javalin.get("/devices", ctx -> respond(customerAgentApiHandle.getDevices(), ctx));
+        javalin.get(prependCid(cid, "/devices"), ctx -> respond(customerAgentApiHandle.getDevices(), ctx));
 
-        javalin.post("/devices/:id/on", ctx -> {
+        javalin.post(prependCid(cid, "/devices/:id/on"), ctx -> {
             final Result<Device, ApiError> result = parseBody(Long.class, ctx.pathParam("id"))
                     .flatMap(id -> customerAgentApiHandle.switchDevice(id, true));
             respond(result, ctx);
         });
 
-        javalin.post("/devices/:id/off", ctx -> {
+        javalin.post(prependCid(cid, "/devices/:id/off"), ctx -> {
             final Result<Device, ApiError> result = parseBody(Long.class, ctx.pathParam("id"))
                     .flatMap(id -> customerAgentApiHandle.switchDevice(id, false));
             respond(result, ctx);
         });
 
-        javalin.get("/obligations", ctx -> respond(customerAgentApiHandle.getObligationHistory(), ctx));
+        javalin.get(prependCid(cid, "/obligations"), ctx -> respond(customerAgentApiHandle.getObligationHistory(), ctx));
 
-        javalin.get("/obligations/current", ctx -> respond(customerAgentApiHandle.getCurrentObligation(), ctx));
+        javalin.get(prependCid(cid, "/obligations/current"), ctx -> respond(customerAgentApiHandle.getCurrentObligation(), ctx));
 
-        javalin.get("/offers/current", ctx -> respond(customerAgentApiHandle.getCurrentOffer(), ctx));
+        javalin.get(prependCid(cid, "/offers/current"), ctx -> respond(customerAgentApiHandle.getCurrentOffer(), ctx));
 
-        javalin.get("/offers", ctx -> respond(customerAgentApiHandle.getOffersHistory(), ctx));
+        javalin.get(prependCid(cid, "/offers"), ctx -> respond(customerAgentApiHandle.getOffersHistory(), ctx));
 
-        javalin.get("/settings", ctx -> respond(customerAgentApiHandle.getCustomerSettings(), ctx));
+        javalin.get(prependCid(cid, "/settings"), ctx -> respond(customerAgentApiHandle.getCustomerSettings(), ctx));
 
-        javalin.post("/settings", ctx -> {
+        javalin.post(prependCid(cid, "/settings"), ctx -> {
             final Result<CustomerSettings, ApiError> result = parseBody(CustomerSettings.class, ctx.body())
                     .flatMap(customerAgentApiHandle::updateCustomerSettings);
 
             respond(result, ctx);
         });
+    }
+
+    private String prependCid(final int cid, final String path) {
+        return "/" + cid + path;
     }
 
     private <T> Result<T, ApiError> parseBody(final Class<T> targetClass, final String json) {

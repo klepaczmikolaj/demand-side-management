@@ -30,4 +30,6 @@ public interface CustomerAgentApiHandle {
 
     Result<Device, ApiError> switchDevice(final Long id, boolean on);
 
+    int getCustomerCid();
+
 }

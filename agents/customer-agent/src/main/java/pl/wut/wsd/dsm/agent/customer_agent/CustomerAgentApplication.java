@@ -67,7 +67,7 @@ public class CustomerAgentApplication {
         final AgentContainer container = createAgentContainer(hostname, containerPort, customerID);
 
         final int javalinPort = InetUtils.getFreePort();
-        final Javalin javalin = startJavalin(8088); //TODO make not fixed
+        final Javalin javalin = startJavalin(customerID.intValue());
 
         final CustomerAgentDependencies dependencies = CustomerAgentDependencies.builder()
                 .customer(new Customer(customerID))

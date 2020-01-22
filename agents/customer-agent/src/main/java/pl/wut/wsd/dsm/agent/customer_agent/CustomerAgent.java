@@ -69,7 +69,7 @@ public class CustomerAgent extends Agent {
         notificationAdapter = dependencies.getNotificationAdapter();
 
         this.offersService = offerObligationService;
-        final DefaultCustomerApiHandle handle = new DefaultCustomerApiHandle(offerObligationService, offerObligationService, new SettingsService(), devices);
+        final DefaultCustomerApiHandle handle = new DefaultCustomerApiHandle(offerObligationService, offerObligationService, new SettingsService(), devices, customer);
         new ApiInitializer().initialize(dependencies.getJavalin(), handle);
 
         addBehaviour(new MessageHandler(this,

@@ -1,6 +1,7 @@
 package pl.wut.wsd.dsm.agent.customer_agent;
 
 import lombok.RequiredArgsConstructor;
+import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.customer_agent.core.ObligationsService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Device;
@@ -24,6 +25,7 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
     private final OffersService offersService;
     private final SettingsService settingsService;
     private final Devices devices;
+    private final Customer customer;
 
     @Override
     public Result<ObligationRepresentation, ApiError> postObligation(final ObligationAcceptanceRequest acceptance) {
@@ -84,5 +86,10 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
             deviceOpt.get().setOn(on);
             return Result.ok(deviceOpt.get());
         }
+    }
+
+    @Override
+    public int getCustomerCid() {
+        return customer.getCustomerId().intValue();
     }
 }
