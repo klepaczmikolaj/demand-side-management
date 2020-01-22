@@ -39,6 +39,10 @@
             <groupId>pl.wut.wsd.dsm</groupId>
             <artifactId>properties</artifactId>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>consumption-protocol</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

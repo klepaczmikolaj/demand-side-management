@@ -41,6 +41,10 @@
             <artifactId>logging-interceptor</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
+        <dependency>
+            <groupId>pl.wut.wsd.dsm</groupId>
+            <artifactId>consumption-protocol</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
