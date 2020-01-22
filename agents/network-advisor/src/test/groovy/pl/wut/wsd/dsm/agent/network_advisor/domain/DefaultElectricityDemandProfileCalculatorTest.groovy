@@ -22,7 +22,7 @@ class DefaultElectricityDemandProfileCalculatorTest extends Specification {
 
         then:
         result.measurements[fixedDate] == expected
-        result.measurements[fixedDate.plusHours(1)] == expected
+        result.measurements[fixedDate.plusHours(1)] == expected1
 
         where:
         forecast | expected               | expected1

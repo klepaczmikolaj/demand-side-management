@@ -31,16 +31,16 @@ create table customer
 
 create table offer
 (
-  id                  bigint(20)  not null auto_increment,
-  offer_id            binary(16)  not null,
-  customer_id         bigint(20)  not null,
-  valid_until         datetime    not null,
-  state               varchar(15) not null,
-  type                varchar(15) not null,
-  size                decimal     not null,
-  price               decimal     not null,
-  demand_change_since datetime    not null,
-  demand_change_until datetime    not null,
+  id                  bigint(20)     not null auto_increment,
+  offer_id            binary(16)     not null,
+  customer_id         bigint(20)     not null,
+  valid_until         datetime       not null,
+  state               varchar(15)    not null,
+  type                varchar(15)    not null,
+  size                decimal(10, 2) not null,
+  price               decimal(10, 2) not null,
+  demand_change_since datetime       not null,
+  demand_change_until datetime       not null,
   primary key (id),
   foreign key (customer_id) references customer (id)
 );

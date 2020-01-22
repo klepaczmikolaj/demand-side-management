@@ -20,6 +20,7 @@ public class ApiTypesMapper {
         representation.setDemandChangeStart(increase.getSince());
         representation.setDemandChangeEnd(increase.getUntil());
         representation.setType(offer.getType());
+        representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
 
         return representation;
     }

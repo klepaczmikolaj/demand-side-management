@@ -34,7 +34,7 @@ public class CustomerTrustAgent extends Agent {
         addBehaviour(new MessageHandler(this,
                 MessageSpecification.of(GetCustomerTrustProtocol.customerTrustRequest.toMessageTemplate(), this::handleRankingRequest)
         ));
-        addBehaviour(new TickerBehaviour(this, Duration.ofSeconds(10).toMillis()) {
+        addBehaviour(new TickerBehaviour(this, Duration.ofSeconds(60).toMillis()) {
             @Override
             protected void onTick() {
                 refreshRanking();

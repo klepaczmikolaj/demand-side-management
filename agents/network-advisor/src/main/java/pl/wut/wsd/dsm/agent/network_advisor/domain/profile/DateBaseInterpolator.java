@@ -24,11 +24,11 @@ public abstract class DateBaseInterpolator<T extends Number> {
         final T y1 = measurements.get(closestDates.closestBefore);
         final T y2 = measurements.get(closestDates.closestAfter);
 
-        final double secondDistance = closestDates.closestAfter.getSecond() - closestDates.closestBefore.getSecond();
+        final double secondDistance = closestDates.closestAfter.toEpochSecond() - closestDates.closestBefore.toEpochSecond();
         final double x1Distance = Duration.between(closestDates.closestBefore, at).getSeconds();
         final double x2Distance = Duration.between(closestDates.closestAfter, at).getSeconds();
 
-        return ((x1Distance * y1.doubleValue()) + x2Distance * y2.doubleValue()) / secondDistance;
+        return Math.abs(((x1Distance * y1.doubleValue()) + x2Distance * y2.doubleValue()) / secondDistance);
     }
 
     private Dates findClosesDates(final ZonedDateTime at, final List<ZonedDateTime> sortedDates) {
@@ -39,15 +39,17 @@ public abstract class DateBaseInterpolator<T extends Number> {
             return Dates.of(beforeLast, last);
         }
 
+        boolean first = true;
         while (iterator.hasNext()) {
             final ZonedDateTime next = iterator.next();
             if (next.isAfter(at)) {
-                if (iterator.hasPrevious()) {
+                if (iterator.hasPrevious() && !first) {
                     return Dates.of(iterator.previous(), next);
                 } else {
                     return Dates.of(next, iterator.next());
                 }
             }
+            first = false;
         }
         throw new RuntimeException("xd");
     }

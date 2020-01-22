@@ -27,7 +27,5 @@ class TrustRankingComputerTest extends Specification {
         where:
         obligations                                                                                | expected
         [new Obligation(sizeKws: 50, state: CustomerObligationState.FAILED, perecentageKept: 0.0)] | new TrustRankingComputer.TrustComputationResult(2.5D, 100.0D)
-
-
     }
 }

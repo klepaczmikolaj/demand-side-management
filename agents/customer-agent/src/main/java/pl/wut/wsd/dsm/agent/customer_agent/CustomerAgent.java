@@ -21,6 +21,7 @@ import pl.wut.wsd.dsm.agent.customer_agent.settings.SettingsService;
 import pl.wut.wsd.dsm.agent.infrastructure.InetUtils;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
+import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
@@ -28,6 +29,8 @@ import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
+
+import java.time.Duration;
 
 
 @Slf4j
@@ -110,13 +113,9 @@ public class CustomerAgent extends Agent {
         final Property cusId = new Property("customerId", customerId);
         final Property restApiAddress = new Property(customerApiAddressProperty, String.format("http://%s:%d/", InetUtils.getMyHostname().orElse("localhost"), javalinPort));
 
-        dfAgentDescription.addServices(serviceDescriptionFactory.nameAndProperties("customer-agent", cusId, restApiAddress));
-        dfAgentDescription.addServices(customerDraftProtocol.sendCustomerOffer().serviceDescription(customer));
-        dfAgentDescription.addServices(customerDraftProtocol.informOfCustomerHandlerAcceptance().serviceDescription(customer));
-        try {
-            DFService.register(this, dfAgentDescription);
-        } catch (final FIPAException e) {
-            log.error("Could not register to whitepages", e);
-        }
+        new ServiceRegistration(this).registerRetryOnFailure(Duration.ofSeconds(3),
+                serviceDescriptionFactory.nameAndProperties("customer-agent", cusId, restApiAddress),
+                customerDraftProtocol.sendCustomerOffer().serviceDescription(customer),
+                customerDraftProtocol.informOfCustomerHandlerAcceptance().serviceDescription(customer));
     }
 }
