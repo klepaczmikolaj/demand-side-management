@@ -1,9 +1,9 @@
-package pl.wut.wsd.dsm.agent.customer_handler.infrastructure.hibernate
+package pl.wut.wsd.dsm.agent.customerHandler.infrastructure.hibernate
 
-import pl.wut.wsd.dsm.agent.customer_handler.model.CustomerObligationState
-import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation
-import pl.wut.wsd.dsm.agent.customer_handler.model.Offer
-import pl.wut.wsd.dsm.agent.customer_handler.test.features.TestHibernateTemplate
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.CustomerObligationState
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Obligation
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Offer
+import pl.wut.wsd.dsm.agent.customerHandler.test.features.TestHibernateTemplate
 import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate
 import spock.lang.Specification
 

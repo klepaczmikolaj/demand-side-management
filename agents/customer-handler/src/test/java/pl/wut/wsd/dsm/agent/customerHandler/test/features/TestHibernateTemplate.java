@@ -1,9 +1,9 @@
-package pl.wut.wsd.dsm.agent.customer_handler.test.features;
+package pl.wut.wsd.dsm.agent.customerHandler.test.features;
 
 import com.mysql.jdbc.Driver;
 import org.hibernate.dialect.MySQL8Dialect;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Obligation;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Offer;
 import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
 
 import java.util.Arrays;

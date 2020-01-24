@@ -1,4 +1,4 @@
-package pl.wut.wsd.dsm.agent.customer_handler;
+package pl.wut.wsd.dsm.agent.customerHandler;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package pl.wut.wsd.dsm.agent.customer_handler.model;
+package pl.wut.wsd.dsm.agent.customerHandler.domain.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;

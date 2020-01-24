@@ -1,6 +1,6 @@
-package pl.wut.wsd.dsm.agent.customer_handler.persistence;
+package pl.wut.wsd.dsm.agent.customerHandler.persistence;
 
-import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Offer;
 
 import java.util.Optional;
 import java.util.UUID;

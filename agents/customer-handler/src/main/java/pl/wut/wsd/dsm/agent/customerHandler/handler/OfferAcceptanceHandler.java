@@ -1,13 +1,13 @@
-package pl.wut.wsd.dsm.agent.customer_handler.handler;
+package pl.wut.wsd.dsm.agent.customerHandler.handler;
 
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerObligationRepository;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerOfferRepository;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Obligation;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Offer;
+import pl.wut.wsd.dsm.agent.customerHandler.persistence.CustomerObligationRepository;
+import pl.wut.wsd.dsm.agent.customerHandler.persistence.CustomerOfferRepository;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.handle.ParsingHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;

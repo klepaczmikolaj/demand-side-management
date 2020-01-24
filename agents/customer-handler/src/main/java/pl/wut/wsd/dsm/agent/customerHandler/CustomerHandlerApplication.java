@@ -1,16 +1,15 @@
-package pl.wut.wsd.dsm.agent.customer_handler;
+package pl.wut.wsd.dsm.agent.customerHandler;
 
 import com.mysql.jdbc.Driver;
 import jade.wrapper.AgentContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.MySQL8Dialect;
 import pl.wut.dsm.ontology.customer.Customer;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Obligation;
-import pl.wut.wsd.dsm.agent.customer_handler.model.Offer;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerObligationRepository;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.CustomerOfferRepository;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.HibernateCustomerObligationRepository;
-import pl.wut.wsd.dsm.agent.customer_handler.persistence.HibernateOfferRepository;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Obligation;
+import pl.wut.wsd.dsm.agent.customerHandler.domain.model.Offer;
+import pl.wut.wsd.dsm.agent.customerHandler.persistence.HibernateCustomerObligationRepository;
+import pl.wut.wsd.dsm.agent.customerHandler.persistence.HibernateCustomerRepository;
+import pl.wut.wsd.dsm.agent.customerHandler.persistence.HibernateOfferRepository;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
@@ -29,14 +28,13 @@ public class CustomerHandlerApplication {
         final CustomerHandlerApplicationProperties properties = CustomerHandlerApplicationProperties.parse(args);
 
         final HibernateTemplate template = new HibernateTemplate(properties.dbUrl(), properties.dbUser(), properties.dbPass(), Driver.class, MySQL8Dialect.class, jpaClasses);
-        final CustomerObligationRepository obligationRepository = new HibernateCustomerObligationRepository(template);
-        final CustomerOfferRepository customerOfferRepository = new HibernateOfferRepository(template);
 
         final CustomerHandlerDependencies dependencies = CustomerHandlerDependencies.builder()
                 .codec(Codec.json())
                 .customer(new Customer(properties.customerId()))
-                .customerObligationRepository(obligationRepository)
-                .customerOfferRepository(customerOfferRepository)
+                .customerObligationRepository(new HibernateCustomerObligationRepository(template))
+                .customerOfferRepository(new HibernateOfferRepository(template))
+                .customerRepository(new HibernateCustomerRepository(template))
                 .build();
 
         final AgentContainer customerAgentContainer = agentStartupManager.startChildContainer(properties);

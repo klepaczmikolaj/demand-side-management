@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Data
 public class CustomerObligation {
+    private Long id;
     private UUID relatedOfferId;
     private ObligationType obligationType;
     private double kwsChange;

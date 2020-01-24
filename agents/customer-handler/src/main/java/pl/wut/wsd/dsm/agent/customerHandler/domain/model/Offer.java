@@ -1,4 +1,4 @@
-package pl.wut.wsd.dsm.agent.customer_handler.model;
+package pl.wut.wsd.dsm.agent.customerHandler.domain.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,7 +33,7 @@ public class Offer extends Identifiable<Long> {
 
     @NonNull
     @Column(name = "customer_id", nullable = false)
-    private Long customerId;
+    private Customer customer;
 
     @NonNull
     @Column(name = "valid_until", nullable = false)
@@ -78,23 +78,23 @@ public class Offer extends Identifiable<Long> {
     }
 
     public static Offer reduction(@NonNull final UUID offerId,
-                                  @NonNull final Long customerId,
+                                  @NonNull final Customer customer,
                                   @NonNull final ZonedDateTime validUntil,
                                   @NonNull final Double kws,
                                   @NonNull final BigDecimal pricePerKw,
                                   @NonNull final ZonedDateTime demandChangeSince,
                                   @NonNull final ZonedDateTime demandChangeUntil) {
-        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.REDUCTION, kws, pricePerKw, demandChangeSince, demandChangeUntil);
+        return new Offer(offerId, customer, validUntil, State.PENDING, Type.REDUCTION, kws, pricePerKw, demandChangeSince, demandChangeUntil);
     }
 
     @Builder(builderMethodName = "increase", buildMethodName = "increase", access = AccessLevel.PUBLIC)
     public static Offer increase(@NonNull final UUID offerId,
-                                 @NonNull final Long customerId,
+                                 @NonNull final Customer customer,
                                  @NonNull final ZonedDateTime validUntil,
                                  @NonNull final Double kws,
                                  @NonNull final BigDecimal pricePerKw,
                                  @NonNull final ZonedDateTime demandChangeSince,
                                  @NonNull final ZonedDateTime demandChangeUntil) {
-        return new Offer(offerId, customerId, validUntil, State.PENDING, Type.INCREASE, kws, pricePerKw, demandChangeSince, demandChangeUntil);
+        return new Offer(offerId, customer, validUntil, State.PENDING, Type.INCREASE, kws, pricePerKw, demandChangeSince, demandChangeUntil);
     }
 }

@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.SchemaAutoTooling;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
@@ -44,6 +45,7 @@ public class HibernateTemplate {
         settings.setProperty(Environment.PASS, password);
         settings.setProperty(Environment.DIALECT, dialectClass.getCanonicalName());
         settings.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, ThreadLocalSessionContext.class.getCanonicalName());
+        settings.setProperty(Environment.HBM2DDL_AUTO, SchemaAutoTooling.UPDATE.name());
 
         this.registry = new StandardServiceRegistryBuilder()
                 .applySettings(settings)

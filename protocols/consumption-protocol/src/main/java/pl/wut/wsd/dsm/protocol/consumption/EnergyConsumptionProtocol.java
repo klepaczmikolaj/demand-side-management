@@ -11,7 +11,7 @@ import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class EnergyConsumptionProtocol extends Protocol {
 
-    private static final EnergyConsumptionProtocol instance = new EnergyConsumptionProtocol();
+    public static final EnergyConsumptionProtocol INSTANCE = new EnergyConsumptionProtocol();
     private final ServiceDescriptionFactory factory = new ServiceDescriptionFactory();
 
     public ConsumptionInformation informationStep(final Long customerId) {
@@ -22,7 +22,7 @@ public class EnergyConsumptionProtocol extends Protocol {
         private final Long customerId;
 
         private ConsumptionInformation(final Long customerId) {
-            super("Inform of consumption", ACLMessage.INFORM, true, EnergyConsumption.class, instance, factory.nameAndProperties("consumption-consumer", new Property("customerId", customerId)));
+            super("Inform of consumption", ACLMessage.INFORM, true, EnergyConsumption.class, INSTANCE, factory.nameAndProperties("consumption-consumer", new Property("customerId", customerId)));
             this.customerId = customerId;
         }
     }

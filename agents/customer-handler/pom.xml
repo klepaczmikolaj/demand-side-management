@@ -63,7 +63,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>pl.wut.wsd.dsm.agent.customer_handler.CustomerHandlerApplication
+                                    <mainClass>pl.wut.wsd.dsm.agent.customerHandler.CustomerHandlerApplication
                                     </mainClass>
                                 </transformer>
                             </transformers>
