@@ -7,6 +7,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 
@@ -15,8 +17,9 @@ import java.time.ZonedDateTime;
 @Table(name = "obligation_view")
 public class Obligation extends Identifiable<Long> {
 
-    @Column(name = "customer_id")
-    private Long customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)

@@ -10,6 +10,8 @@ import pl.wut.wsd.dsm.infrastructure.persistence.model.Identifiable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Getter
@@ -20,9 +22,9 @@ import javax.persistence.Table;
 @Table(name = "customer_trust")
 public class CustomerTrust extends Identifiable<Long> {
 
-
-    @Column(name = "customer_id", unique = true)
-    private Long customerId;
+    @OneToOne
+    @JoinColumn(name = "customer_id", unique = true)
+    private Customer customer;
 
     @Setter
     @Column(name = "current_value")
@@ -32,7 +34,7 @@ public class CustomerTrust extends Identifiable<Long> {
     @Column(name = "kws_processed")
     private Double kwsProcessed;
 
-    public static CustomerTrust forCustomer(final Long customerId) {
-        return new CustomerTrust(customerId, 0.0, 0.0);
+    public static CustomerTrust forCustomer(final Customer customer) {
+        return new CustomerTrust(customer, 0.0, 0.0);
     }
 }

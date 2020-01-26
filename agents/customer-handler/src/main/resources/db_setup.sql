@@ -22,10 +22,11 @@ FLUSH PRIVILEGES;
 
 create table customer
 (
-  id          bigint(20)   not null auto_increment,
-  first_name  varchar(50)  not null,
-  second_name varchar(50)  not null,
-  password    varchar(500) not null,
+  id                  bigint(20)  not null auto_increment,
+  customer_id         bigint(20)  not null unique,
+  login               varchar(50) not null,
+  name                varchar(50) not null,
+  nominal_usage_watts int         not null,
   primary key (id)
 );
 
@@ -77,45 +78,3 @@ create view obligation_view as
 SELECT ob.*, of.demand_change_since as since, of.demand_change_until as until
 FROM obligation ob
        join offer `of` on ob.offer_id = of.id;
-
-insert into customer(id, first_name, second_name, password)
-values (1, 'Anrold', 'Boczek', 'arnib@xd');
-insert into customer(id, first_name, second_name, password)
-values (2, 'Celina', 'Dudek', 'celdud@xd');
-insert into customer(id, first_name, second_name, password)
-values (3, 'Ewa', 'Farna', 'ewcia@xd');
-insert into customer(id, first_name, second_name, password)
-values (4, 'Grzegorz', 'Huśtawka', 'ghus@xd');
-insert into customer(id, first_name, second_name, password)
-values (5, 'Iga', 'Jaworska', 'ijaw@xd');
-insert into customer(id, first_name, second_name, password)
-values (6, 'Karol', 'Lunatyk', 'arnib@xd');
-insert into customer(id, first_name, second_name, password)
-values (7, 'Łukasz', 'Mariański', 'ł@xd');
-insert into customer(id, first_name, second_name, password)
-values (8, 'Natalia', 'Oparus', 'mnon@xd');
-insert into customer(id, first_name, second_name, password)
-values (9, 'Paweł', 'Ruchał', 'pruchacz@xd');
-insert into customer(id, first_name, second_name, password)
-values (10, 'Stefan', 'Trawka', 'szielnik@xd');
-
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('1', '1', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('2', '2', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('3', '3', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('4', '4', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('5', '5', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('6', '6', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('7', '7', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('8', '8', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('9', '9', '0', '0');
-INSERT INTO `wsd_dsm`.`customer_trust` (`id`, `customer_id`, `current_value`, `kws_processed`)
-VALUES ('10', '10', '0', '0');

@@ -6,6 +6,10 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.RankingReader;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.Customer;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrust;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.repo.CustomerRepository;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.repo.TrustRankingRepository;
 import pl.wut.wsd.dsm.agent.trust_factor.ranking.TrustRankingRefresher;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.codec.DecodingError;
@@ -18,6 +22,7 @@ import pl.wut.wsd.dsm.ontology.trust.GetTrustRankingRequest;
 import pl.wut.wsd.dsm.protocol.customer_trust.GetCustomerTrustProtocol;
 
 import java.time.Duration;
+import java.util.List;
 
 @Slf4j
 public class CustomerTrustAgent extends Agent {
@@ -31,13 +36,21 @@ public class CustomerTrustAgent extends Agent {
         final CustomerTrustAgentDependencies dependencies = (CustomerTrustAgentDependencies) getArguments()[0];
         this.trustRankingRefresher = dependencies.getTrustRankingRefresher();
         this.rankingReader = dependencies.getRankingReader();
+        ensureAllCustomersHaveCorespondingEntry(dependencies.getCustomerRepository(), dependencies.getTrustRankingRepository());
+
         addBehaviour(new MessageHandler(this,
                 MessageSpecification.of(GetCustomerTrustProtocol.customerTrustRequest.toMessageTemplate(), this::handleRankingRequest)
         ));
-        addBehaviour(new TickerBehaviour(this, Duration.ofSeconds(60).toMillis()) {
+        addBehaviour(new TickerBehaviour(this, Duration.ofMinutes(1).toMillis()) {
             @Override
             protected void onTick() {
                 refreshRanking();
+            }
+        });
+        addBehaviour(new TickerBehaviour(this, Duration.ofMinutes(1).toMillis()) {
+            @Override
+            protected void onTick() {
+                ensureAllCustomersHaveCorespondingEntry(dependencies.getCustomerRepository(), dependencies.getTrustRankingRepository());
             }
         });
         final ServiceRegistration serviceRegistration = new ServiceRegistration(this);
@@ -70,5 +83,13 @@ public class CustomerTrustAgent extends Agent {
 
     private CustomerTrustRanking computeRanking(final GetTrustRankingRequest request) {
         return rankingReader.getRanking(request);
+    }
+
+    private void ensureAllCustomersHaveCorespondingEntry(final CustomerRepository customerRepository, final TrustRankingRepository trustRepository) {
+        final List<Customer> customers = customerRepository.findAllCustomers();
+        customers.stream()
+                .filter(c -> !trustRepository.getForCustomer(c).isPresent())
+                .map(CustomerTrust::forCustomer)
+                .forEach(trustRepository::save);
     }
 }

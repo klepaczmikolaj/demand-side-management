@@ -41,6 +41,6 @@ public class RankingReader {
     private CustomerTrustRankingEntry toEntry(final Map.Entry<Integer, CustomerTrust> rankAndTrust) {
         final CustomerTrust trust = rankAndTrust.getValue();
 
-        return CustomerTrustRankingEntry.of(rankAndTrust.getKey(), new Customer(trust.getCustomerId()), trust.getCurrentValue());
+        return CustomerTrustRankingEntry.of(rankAndTrust.getKey(), new Customer(trust.getCustomer().getCustomerId()), trust.getCurrentValue());
     }
 }

@@ -22,7 +22,10 @@ import java.util.Set;
 public class CustomerHandlerApplication {
 
     private static final AgentStartupManager agentStartupManager = new AgentStartupManager();
-    private final static Set<Class<?>> jpaClasses = new HashSet<>(Arrays.asList(Obligation.class, Offer.class));
+    private final static Set<Class<?>> jpaClasses = new HashSet<>(Arrays.asList(
+            pl.wut.wsd.dsm.agent.customerHandler.domain.model.Customer.class,
+            Obligation.class,
+            Offer.class));
 
     public static void main(final String[] args) throws Exception {
         final CustomerHandlerApplicationProperties properties = CustomerHandlerApplicationProperties.parse(args);

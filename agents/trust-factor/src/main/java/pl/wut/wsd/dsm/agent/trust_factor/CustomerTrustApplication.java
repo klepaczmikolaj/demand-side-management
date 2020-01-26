@@ -5,9 +5,12 @@ import jade.wrapper.AgentContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.MySQL8Dialect;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.RankingReader;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.Customer;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrust;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrustRefreshDetails;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.Obligation;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.repo.DefaultTrustRankingRepository;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.repo.HibernateCustomerRepository;
 import pl.wut.wsd.dsm.agent.trust_factor.ranking.TrustRankingRefresher;
 import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
@@ -35,12 +38,14 @@ public class CustomerTrustApplication {
                 properties.dbPass(),
                 Driver.class,
                 MySQL8Dialect.class,
-                new HashSet<>(Arrays.asList(CustomerTrust.class, Obligation.class, CustomerTrustRefreshDetails.class))
+                new HashSet<>(Arrays.asList(CustomerTrust.class, Obligation.class, CustomerTrustRefreshDetails.class, Customer.class))
         );
 
         return CustomerTrustAgentDependencies.builder()
                 .rankingReader(new RankingReader(hibernateTemplate))
                 .trustRankingRefresher(new TrustRankingRefresher(hibernateTemplate))
+                .customerRepository(new HibernateCustomerRepository(hibernateTemplate))
+                .trustRankingRepository(new DefaultTrustRankingRepository(hibernateTemplate))
                 .build();
     }
 }

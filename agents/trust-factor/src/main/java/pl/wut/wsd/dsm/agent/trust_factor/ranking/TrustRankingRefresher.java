@@ -2,9 +2,9 @@ package pl.wut.wsd.dsm.agent.trust_factor.ranking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.Customer;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrust;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrustRefreshDetails;
-import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.CustomerTrust_;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.model.Obligation;
 import pl.wut.wsd.dsm.agent.trust_factor.persistence.specification.AllObligationsResolved;
 import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
@@ -31,7 +31,7 @@ public class TrustRankingRefresher {
         //TODO, read and write in transaction
         final List<Obligation> obligations = hibernateTemplate.findAll(specification, Obligation.class);
 
-        final Map<Long, Set<Obligation>> obligationsByCustomer = obligations.stream().collect(Collectors.groupingBy(Obligation::getCustomerId, Collectors.toSet()));
+        final Map<Customer, Set<Obligation>> obligationsByCustomer = obligations.stream().collect(Collectors.groupingBy(Obligation::getCustomer, Collectors.toSet()));
 
         obligationsByCustomer.forEach(this::updateTrustRankingForCustomer);
 
@@ -43,14 +43,14 @@ public class TrustRankingRefresher {
     }
 
 
-    private void updateTrustRankingForCustomer(final Long customerId, final Set<Obligation> obligations) {
-        final CustomerTrust customerTrust = hibernateTemplate.findOne((r, cb) -> cb.equal(r.get(CustomerTrust_.customerId), customerId), CustomerTrust.class)
-                .orElseGet(() -> CustomerTrust.forCustomer(customerId));
+    private void updateTrustRankingForCustomer(final Customer customer, final Set<Obligation> obligations) {
+        if (customer.getTrust() == null) {
+            customer.setTrust(CustomerTrust.forCustomer(customer));
+        }
 
-        final TrustRankingComputer.TrustComputationResult computed = computer.compute(customerTrust, obligations);
-        customerTrust.setCurrentValue(computed.newValue);
-        customerTrust.setKwsProcessed(computed.processed);
+        final TrustRankingComputer.TrustComputationResult computed = computer.compute(customer.getTrust(), obligations);
+        customer.getTrust().setKwsProcessed(computed.processed);
 
-        hibernateTemplate.saveOrUpdate(customerTrust);
+        hibernateTemplate.saveOrUpdate(customer);
     }
 }

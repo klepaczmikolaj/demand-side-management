@@ -22,6 +22,8 @@ import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import pl.wut.wsd.dsm.protocol.consumption.EnergyConsumptionProtocol;
 
 import java.time.Duration;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 public class CustomerHandlerAgent extends Agent {
@@ -44,9 +46,10 @@ public class CustomerHandlerAgent extends Agent {
         consumptionInformation = EnergyConsumptionProtocol.INSTANCE.informationStep(customer.getCustomerId());
 
         final CustomerRepository customerRepo = dependencies.getCustomerRepository();
+        onBoardCustomerIfDoesntExist(customerRepo, customer);
 
         final CustomerOfferHandler customerOfferHandler = new CustomerOfferHandler(codec, new CustomerDraftProtocol().sendCustomerOffer(), this, serviceDiscovery, offerRepo, mapper, customerRepo);
-        final OfferAcceptanceHandler offerAcceptanceHandler = new OfferAcceptanceHandler(codec, customerDraftProtocol.acceptClientDecision(), offerRepo, obligationRepo, messaging, customerDraftProtocol.informOfCustomerHandlerAcceptance());
+        final OfferAcceptanceHandler offerAcceptanceHandler = new OfferAcceptanceHandler(codec, customerDraftProtocol.acceptClientDecision(), offerRepo, obligationRepo, messaging, customerDraftProtocol.informOfCustomerHandlerAcceptance(), customerRepo);
         final ConsumptionMonitor consumptionMonitor = new ConsumptionMonitor(codec, consumptionInformation, obligationRepo, customer.getCustomerId());
 
         this.addBehaviour(
@@ -56,6 +59,18 @@ public class CustomerHandlerAgent extends Agent {
                         MessageSpecification.of(consumptionInformation.toMessageTemplate(), consumptionMonitor::handle))
         );
         registerToWhitepages();
+    }
+
+    private void onBoardCustomerIfDoesntExist(final CustomerRepository customerRepo, final Customer customer) {
+        final Optional<pl.wut.wsd.dsm.agent.customerHandler.domain.model.Customer> searchResult = customerRepo.findByCustomerId(customer.getCustomerId());
+        if (!searchResult.isPresent()) {
+            customerRepo.save(pl.wut.wsd.dsm.agent.customerHandler.domain.model.Customer.builder()
+                    .customerId(customer.getCustomerId())
+                    .login(UUID.randomUUID().toString().substring(0, 8))
+                    .name(UUID.randomUUID().toString().substring(0, 9))
+                    .nominalUsageInWatts(4000)
+                    .build());
+        }
     }
 
     private void registerToWhitepages() {

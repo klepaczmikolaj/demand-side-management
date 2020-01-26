@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -25,8 +26,9 @@ import javax.persistence.Table;
 public class Obligation extends Identifiable<Long> {
 
     @NonNull
-    @Column(name = "customer_id")
-    private Long customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     @NonNull
     @Column(name = "state")
@@ -53,8 +55,8 @@ public class Obligation extends Identifiable<Long> {
     @JoinColumn(name = "offer_id")
     private Offer relatedOffer;
 
-    public static Obligation newObligation(final Long customerId, final double acceptedKws, final Offer relatedOffer) {
-        final Obligation obligation = new Obligation(customerId, CustomerObligationState.DURING_EVALUATION, acceptedKws, relatedOffer);
+    public static Obligation newObligation(final Customer customer, final double acceptedKws, final Offer relatedOffer) {
+        final Obligation obligation = new Obligation(customer, CustomerObligationState.DURING_EVALUATION, acceptedKws, relatedOffer);
         relatedOffer.setObligation(obligation);
 
         return obligation;

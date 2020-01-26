@@ -1,15 +1,18 @@
-package pl.wut.wsd.dsm.agent.customerHandler.domain.model;
+package pl.wut.wsd.dsm.agent.trust_factor.persistence.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.ToString;
 import pl.wut.wsd.dsm.infrastructure.persistence.model.Identifiable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Getter
@@ -30,6 +33,10 @@ public class Customer extends Identifiable<Long> {
 
     @Column(name = "nominal_usage_watts", unique = true, nullable = false)
     private int nominalUsageInWatts;
+
+    @Setter
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "customer")
+    private CustomerTrust trust;
 
     @Builder
     private Customer(@NonNull final String login,
