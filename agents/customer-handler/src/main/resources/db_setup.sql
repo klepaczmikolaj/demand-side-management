@@ -6,9 +6,11 @@ GRANT SELECT ON wsd_dsm.* TO 'wsd_read';
 GRANT INSERT, UPDATE, DELETE ON wsd_dsm.* TO 'wsd_write';
 GRANT CREATE ON wsd_dsm.* TO 'wsd_tables';
 
+CREATE USER 'wsd_dsm_reader'@'%' IDENTIFIED BY 'reader_!234';
 CREATE USER 'wsd_dsm_user'@'%' IDENTIFIED BY 'user_!234';
 CREATE USER 'wsd_dsm_dev'@'%' IDENTIFIED BY 'dev_!234';
 
+GRANT 'wsd_read' TO 'wsd_dsm_reader';
 GRANT 'wsd_read' TO 'wsd_dsm_user';
 GRANT 'wsd_write' TO 'wsd_dsm_user';
 GRANT 'wsd_read' TO 'wsd_dsm_dev';
@@ -17,6 +19,7 @@ GRANT 'wsd_tables' TO 'wsd_dsm_dev';
 
 SET DEFAULT ROLE 'wsd_read', 'wsd_write' TO 'wsd_dsm_user';
 SET DEFAULT ROLE 'wsd_read', 'wsd_write', 'wsd_tables' TO 'wsd_dsm_dev';
+SET DEFAULT ROLE 'wsd_read' TO 'wsd_dsm_reader';
 
 FLUSH PRIVILEGES;
 

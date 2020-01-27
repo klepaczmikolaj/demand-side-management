@@ -73,6 +73,7 @@ public class CustomerAgentApplication {
                 .javalinPort(customerID.intValue())
                 .codec(Codec.json())
                 .notificationAdapter(new GoogleNotificationsAdapter(notificationKey, customerNotificationId))
+
                 .build();
 
         startupManager.startAgent(container, CustomerAgent.class, "customer-agent" + customerID, dependencies);
