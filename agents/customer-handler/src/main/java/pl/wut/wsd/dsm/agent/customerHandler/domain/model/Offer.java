@@ -80,6 +80,10 @@ public class Offer extends Identifiable<Long> {
         INCREASE, REDUCTION
     }
 
+    public boolean isReduction() {
+        return this.type == Type.REDUCTION;
+    }
+
     public static Offer reduction(@NonNull final UUID offerId,
                                   @NonNull final Customer customer,
                                   @NonNull final ZonedDateTime validUntil,

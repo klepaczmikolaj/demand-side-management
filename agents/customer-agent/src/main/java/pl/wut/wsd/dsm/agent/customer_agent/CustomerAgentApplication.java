@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.Options;
 import pl.wut.dsm.ontology.customer.Customer;
 import pl.wut.wsd.dsm.agent.external.google.GoogleNotificationsAdapter;
-import pl.wut.wsd.dsm.agent.infrastructure.InetUtils;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
 import pl.wut.wsd.dsm.infrastructure.properties.config.AgentConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.CommandLineConfiguration;
@@ -66,13 +65,12 @@ public class CustomerAgentApplication {
 
         final AgentContainer container = createAgentContainer(hostname, containerPort, customerID);
 
-        final int javalinPort = InetUtils.getFreePort();
         final Javalin javalin = startJavalin(customerID.intValue());
 
         final CustomerAgentDependencies dependencies = CustomerAgentDependencies.builder()
                 .customer(new Customer(customerID))
                 .javalin(javalin)
-                .javalinPort(javalinPort)
+                .javalinPort(customerID.intValue())
                 .codec(Codec.json())
                 .notificationAdapter(new GoogleNotificationsAdapter(notificationKey, customerNotificationId))
                 .build();

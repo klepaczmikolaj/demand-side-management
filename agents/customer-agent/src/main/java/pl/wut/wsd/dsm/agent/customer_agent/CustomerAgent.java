@@ -3,7 +3,6 @@ package pl.wut.wsd.dsm.agent.customer_agent;
 import io.javalin.Javalin;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
@@ -109,7 +108,6 @@ public class CustomerAgent extends Agent {
     }
 
     private void registerToWhitepages(final Long customerId, final int javalinPort) {
-        final DFAgentDescription dfAgentDescription = new DFAgentDescription();
         final Property cusId = new Property("customerId", customerId);
         final Property restApiAddress = new Property(customerApiAddressProperty, String.format("http://%s:%d/", InetUtils.getMyHostname().orElse("localhost"), javalinPort));
 

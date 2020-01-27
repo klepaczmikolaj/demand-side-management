@@ -28,7 +28,7 @@ class ConsumptionMonitorTest extends Specification {
         getAllUnresolved(customerId) >> MOCK_OBLIGATIONS
     }
 
-    private final ConsumptionMonitor monitor = new ConsumptionMonitor(codec, step, repository, customerId)
+    private final ConsumptionMonitor monitor = new ConsumptionMonitor(codec, step, repository, customerRepository, customerId)
 
 
     def "Should add new consumption entry only to ongoing obligations"() {

@@ -55,11 +55,21 @@ public class Obligation extends Identifiable<Long> {
     @JoinColumn(name = "offer_id")
     private Offer relatedOffer;
 
+    public void setPercentageKept(final double percentageKept) {
+        this.perecentageKept = percentageKept;
+        if (percentageKept >= 100.0) {
+            this.state = CustomerObligationState.KEPT;
+        } else {
+            this.state = CustomerObligationState.FAILED;
+        }
+    }
+
     public static Obligation newObligation(final Customer customer, final double acceptedKws, final Offer relatedOffer) {
         final Obligation obligation = new Obligation(customer, CustomerObligationState.DURING_EVALUATION, acceptedKws, relatedOffer);
         relatedOffer.setObligation(obligation);
 
         return obligation;
     }
+
 
 }

@@ -19,6 +19,10 @@ public class CollectionTransformer {
         return nullSafeStream(coll).map(mapper).collect(Collectors.toList());
     }
 
+    public static <T> List<T> merge(final Collection<T> coll, final Collection<T> coll2) {
+        return Stream.concat(nullSafeStream(coll), nullSafeStream(coll2)).collect(Collectors.toList());
+    }
+
     public static <T> double summing(final Collection<T> collection, final ToDoubleFunction<T> doubleFunction) {
         return nullSafeStream(collection).mapToDouble(doubleFunction).filter(Objects::nonNull).sum();
     }
