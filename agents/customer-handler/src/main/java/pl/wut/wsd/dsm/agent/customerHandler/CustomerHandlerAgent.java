@@ -78,7 +78,8 @@ public class CustomerHandlerAgent extends Agent {
 
         serviceRegistration.registerRetryOnFailure(Duration.ofSeconds(1),
                 customerDraftProtocol.sendOfferToHandler().serviceDescription(customer),
-                customerDraftProtocol.acceptClientDecision().serviceDescription(customer));
+                customerDraftProtocol.acceptClientDecision().serviceDescription(customer),
+                EnergyConsumptionProtocol.INSTANCE.informationStep(customer.getCustomerId()).getTargetService());
     }
 
 

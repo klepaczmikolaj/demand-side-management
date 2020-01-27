@@ -49,18 +49,17 @@ public class CustomerAgent extends Agent {
     private Codec codec;
     private NotificationAdapter notificationAdapter;
     private ObigationHistoryLocalStore obligations;
-    private OfferHistoryLocalStore offers;
 
     @Override
     protected void setup() {
         final CustomerAgentDependencies dependencies = (CustomerAgentDependencies) getArguments()[0];
         obligations = new ObigationHistoryLocalStore();
-        offers = new OfferHistoryLocalStore();
         javalin = dependencies.getJavalin();
         customer = dependencies.getCustomer();
         codec = dependencies.getCodec();
         final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
         final AgentMessagingCapability capability = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
+        final OfferHistoryLocalStore offers = new OfferHistoryLocalStore();
         final CustomerObligationService offerObligationService = new CustomerObligationService(
                 capability,
                 codec,
