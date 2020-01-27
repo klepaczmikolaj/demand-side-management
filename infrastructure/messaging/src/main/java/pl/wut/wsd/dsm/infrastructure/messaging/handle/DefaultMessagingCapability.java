@@ -41,4 +41,9 @@ class DefaultMessagingCapability implements AgentMessagingCapability {
 
     }
 
+    @Override
+    public void send(final ACLMessage aclMessage) {
+        agent.send(aclMessage);
+    }
+
 }

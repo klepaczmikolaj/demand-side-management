@@ -16,6 +16,8 @@ public interface AgentMessagingCapability {
      */
     Result<Set<AID>, FIPAException> send(final ACLMessage aclMessage, final ServiceDescription serviceDescription);
 
+    void send(final ACLMessage aclMessage);
+
     static AgentMessagingCapability defaultCapability(final ServiceDiscovery discovery, final Agent agent) {
         return new DefaultMessagingCapability(discovery, agent);
     }

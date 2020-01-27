@@ -2,12 +2,15 @@ package pl.wut.wsd.dsm.agent.customer_agent;
 
 import io.javalin.Javalin;
 import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.agent.customer_agent.core.CurrentUsageSender;
+import pl.wut.wsd.dsm.agent.customer_agent.core.CurrentUsageSenderImpl;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.history.ObigationHistoryLocalStore;
@@ -27,6 +30,7 @@ import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
+import pl.wut.wsd.dsm.protocol.consumption.EnergyConsumptionProtocol;
 import pl.wut.wsd.dsm.service.ServiceDescriptionFactory;
 
 import java.time.Duration;
@@ -55,7 +59,8 @@ public class CustomerAgent extends Agent {
         javalin = dependencies.getJavalin();
         customer = dependencies.getCustomer();
         codec = dependencies.getCodec();
-        final AgentMessagingCapability capability = AgentMessagingCapability.defaultCapability(new ServiceDiscovery(this), this);
+        final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
+        final AgentMessagingCapability capability = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
         final CustomerObligationService offerObligationService = new CustomerObligationService(
                 capability,
                 codec,
@@ -71,10 +76,21 @@ public class CustomerAgent extends Agent {
         final DefaultCustomerApiHandle handle = new DefaultCustomerApiHandle(offerObligationService, offerObligationService, new SettingsService(), devices, customer);
         new ApiInitializer().initialize(dependencies.getJavalin(), handle);
 
+        final CurrentUsageSender currentUsageSender = new CurrentUsageSenderImpl(devices,
+                EnergyConsumptionProtocol.INSTANCE.informationStep(customer.getCustomerId()),
+                serviceDiscovery, codec, capability);
+
         addBehaviour(new MessageHandler(this,
                 MessageSpecification.of(customerDraftProtocol.sendCustomerOffer().toMessageTemplate(), this::processClientOffer),
                 MessageSpecification.of(customerDraftProtocol.informOfCustomerHandlerAcceptance().toMessageTemplate(), this::saveObligation)
         ));
+
+        addBehaviour(new TickerBehaviour(this, Duration.ofSeconds(30).toMillis()) {
+            @Override
+            protected void onTick() {
+                currentUsageSender.sendToCustomerHandler();
+            }
+        });
         registerToWhitepages(customer.getCustomerId(), dependencies.getJavalinPort());
     }
 

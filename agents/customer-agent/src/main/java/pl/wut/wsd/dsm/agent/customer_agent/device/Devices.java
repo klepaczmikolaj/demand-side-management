@@ -46,5 +46,8 @@ public class Devices {
                     .build()
     );
 
+    public double getCurrentUsageInWatts() {
+        return this.devices.stream().filter(Device::isOn).mapToDouble(Device::getUsage).sum();
+    }
 
 }
