@@ -30,7 +30,7 @@ public class NetworkAgentApplication {
     private static final Duration inbalancementCheckAdvancement = Duration.ofHours(1);
     private static final double safetyTreshold = 50;
     private static final ElectricityDemandProfileCalculator demandCalc = new DefaultElectricityDemandProfileCalculator(15, 10000);
-    private static final ElectricityProductionProfileCalculator productionCalc = new DefaultElectricityProductionProfileCalculator(65000, 150000);
+    private static final ElectricityProductionProfileCalculator productionCalc = new DefaultElectricityProductionProfileCalculator(250000, 600000);
     /* ------------------------------------------------------------------------------------- */
 
     public static void main(final String[] args) throws ControllerException {
