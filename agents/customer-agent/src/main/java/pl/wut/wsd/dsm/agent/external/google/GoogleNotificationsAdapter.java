@@ -29,7 +29,7 @@ public class GoogleNotificationsAdapter implements NotificationAdapter {
 
     @Override
     public void sendNotification(final CustomerNotification customerNotification) {
-        if (notificationKey == null) {
+        if (customerNotificationId == null) {
             log.error("Cannot send notification, customer notification id is not set");
             return;
         }
