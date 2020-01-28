@@ -14,6 +14,7 @@ import pl.wut.wsd.dsm.agent.customer_agent.core.CurrentUsageSenderImpl;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
+import pl.wut.wsd.dsm.agent.customer_agent.notification.CustomerNotification;
 import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
 import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.HibernateCustomerObligationRepository;
 import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.HibernateOfferRepository;
@@ -100,7 +101,7 @@ public class CustomerAgent extends Agent {
         log.info("Got client offer!");
         final CustomerOffer offer = codec.decode(aclMessage.getContent(), customerDraftProtocol.sendCustomerOffer().getMessageClass()).result();
 
-//        notificationAdapter.sendNotification(new CustomerNotification("Masz nową wiadomość mordo", codec.encode(offer)));
+        notificationAdapter.sendNotification(new CustomerNotification("Masz nową ofertę", codec.encode(offer)));
         //Send customer notification
     }
 
