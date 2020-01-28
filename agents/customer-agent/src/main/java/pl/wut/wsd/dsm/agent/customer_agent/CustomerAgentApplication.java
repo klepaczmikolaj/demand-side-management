@@ -31,14 +31,12 @@ public class CustomerAgentApplication {
     private static final String mainContainerOption = "container";
     private static final String mainContainerPortOption = "port";
     private static final String customerIdOption = "cid";
-    private static final String firebaseToken = "firebaseToken";
     private static final String notificationsTokenKey = "notificationApiToken";
     private static final String dbUrlConfigKey = "dbUrl";
     private static final String dbUserConfigKey = "dbUser";
     private static final String dbPassConfigKey = "dbPass";
 
     private static final AgentStartupManager startupManager = new AgentStartupManager();
-    private static final String notificationCustomerIdKey = "notificationId";
 
     public static void main(final String[] args) throws Exception {
         final Options options = new Options();
@@ -46,9 +44,7 @@ public class CustomerAgentApplication {
                 .addOption(mainContainerOption, true, "Main container path")
                 .addOption(mainContainerPortOption, true, "Main container port")
                 .addOption(customerIdOption, true, "Customer id")
-                .addOption(firebaseToken, true, "Firebase token")
                 .addOption(notificationsTokenKey, true, "Google notifications constant")
-                .addOption(notificationCustomerIdKey, true, "Customer google notifications id")
                 .addOption(dbUrlConfigKey, true, "Database connection url")
                 .addOption(dbUserConfigKey, true, "DatabaseLogin")
                 .addOption(dbPassConfigKey, true, "Database password");
@@ -73,9 +69,6 @@ public class CustomerAgentApplication {
         final String notificationKey = updatedConfiguration.getProperty(notificationsTokenKey)
                 .orElseThrow(() -> new MissingConfigEntryException(notificationsTokenKey, "notification token (String)"));
 
-        final String customerNotificationId = updatedConfiguration.getProperty(notificationCustomerIdKey)
-                .orElseThrow(() -> new MissingConfigEntryException(notificationCustomerIdKey, "Notification customer id (String)"));
-
         final String dbUrl = updatedConfiguration.getProperty(dbUrlConfigKey)
                 .orElseThrow(() -> new MissingConfigEntryException(dbUrlConfigKey, "Db url (url)"));
 
@@ -99,7 +92,7 @@ public class CustomerAgentApplication {
                 .javalin(javalin)
                 .javalinPort(customerID.intValue())
                 .codec(Codec.json())
-                .notificationAdapter(new GoogleNotificationsAdapter(notificationKey, customerNotificationId))
+                .notificationAdapter(new GoogleNotificationsAdapter(notificationKey))
                 .hibernateTemplate(template)
                 .build();
 

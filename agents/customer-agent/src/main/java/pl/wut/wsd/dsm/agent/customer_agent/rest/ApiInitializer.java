@@ -29,7 +29,7 @@ public class ApiInitializer {
         // Wrzucenie tokenu do wiadomości push
         javalin.post(prependCid(cid, "/pushToken"), ctx -> {
             final String token = ctx.body();
-
+            respond(customerAgentApiHandle.setPushToken(token), ctx);
         });
 
         javalin.get(prependCid(cid, "/devices"), ctx -> respond(customerAgentApiHandle.getDevices(), ctx));

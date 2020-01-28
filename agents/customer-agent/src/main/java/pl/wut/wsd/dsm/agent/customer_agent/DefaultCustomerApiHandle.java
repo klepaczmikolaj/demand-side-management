@@ -6,6 +6,7 @@ import pl.wut.wsd.dsm.agent.customer_agent.core.ObligationsService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Device;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
+import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.CustomerAgentApiHandle;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.ApiError;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.CustomerOfferRepresentation;
@@ -26,6 +27,7 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
     private final SettingsService settingsService;
     private final Devices devices;
     private final Customer customer;
+    private final NotificationAdapter notificationsAdapter;
 
     @Override
     public Result<ObligationRepresentation, ApiError> postObligation(final ObligationAcceptanceRequest acceptance) {
@@ -85,6 +87,13 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
             deviceOpt.get().setOn(on);
             return Result.ok(deviceOpt.get());
         }
+    }
+
+    @Override
+    public Result<String, ApiError> setPushToken(final String notificationKey) {
+        notificationsAdapter.setCustomerNotificationId(notificationKey);
+
+        return Result.ok("Poprawnie ustawiono klucz użytkownika");
     }
 
     @Override

@@ -30,6 +30,8 @@ public interface CustomerAgentApiHandle {
 
     Result<Device, ApiError> switchDevice(final Long id, boolean on);
 
+    Result<String, ApiError> setPushToken(final String notificationKey);
+
     int getCustomerCid();
 
 }

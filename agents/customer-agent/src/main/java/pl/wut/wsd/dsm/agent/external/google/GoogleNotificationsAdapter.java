@@ -20,16 +20,19 @@ public class GoogleNotificationsAdapter implements NotificationAdapter {
     private final Codec codec = Codec.json();
     final OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
     private final String notificationKey;
-    private final String customerNotificationId;
+    private String customerNotificationId;
 
-    public GoogleNotificationsAdapter(final String notificationKey, final String customerNotificationId) {
+    public GoogleNotificationsAdapter(final String notificationKey) {
         this.notificationKey = notificationKey;
-        this.customerNotificationId = customerNotificationId;
     }
 
 
     @Override
     public void sendNotification(final CustomerNotification customerNotification) {
+        if (notificationKey == null) {
+            log.error("Cannot send notification, customer notification id is not set");
+            return;
+        }
         final Notification notification = new Notification(customerNotification.getTitle(), customerNotification.getCustomerMessage());
         final Message message = new Message(852588322724L, notification);
         final GoogleNotification googleNotification = new GoogleNotification(customerNotificationId, message);
@@ -47,6 +50,11 @@ public class GoogleNotificationsAdapter implements NotificationAdapter {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setCustomerNotificationId(final String notificationKey) {
+        this.customerNotificationId = notificationKey;
     }
 
 }
