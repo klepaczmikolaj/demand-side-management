@@ -15,6 +15,7 @@ import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.discovery.ServiceDiscovery;
 import pl.wut.wsd.dsm.infrastructure.handle.ParsingHandler;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
+import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
 import java.util.List;
@@ -57,6 +58,11 @@ public class CustomerOfferHandler extends ParsingHandler<CustomerOffer, Customer
 
     private void persistOffer(final Customer customer, final CustomerOffer customerOffer) {
         final pl.wut.wsd.dsm.agent.customerHandler.domain.model.Customer customerEntity = customerRepository.findByCustomerId(customer.getCustomerId()).get();
+        if (customerOffer.getType() == ObligationType.REDUCTION) {
+            double max = Math.max(customerEntity.getNominalUsageInWatts() - customerOffer.getEnergyConsumptionChange().getAvailKws() * 1000,
+                    0.25 * customerEntity.getNominalUsageInWatts());
+            customerOffer.getEnergyConsumptionChange().setAvailKws(max/1000);
+        }
         final Offer offer = customerHandlerTypesMapper.mapToEntity(customerOffer, customerEntity);
         customerOfferRepository.saveOffer(offer);
     }
