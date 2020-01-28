@@ -50,4 +50,9 @@ public class HibernateCustomerObligationRepository implements CustomerObligation
                 .isPresent();
     }
 
+    @Override
+    public List<Obligation> findAll() {
+        return hibernateTemplate.findAll(Obligation.class);
+    }
+
 }

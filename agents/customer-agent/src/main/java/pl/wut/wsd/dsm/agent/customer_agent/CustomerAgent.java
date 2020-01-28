@@ -13,10 +13,10 @@ import pl.wut.wsd.dsm.agent.customer_agent.core.CurrentUsageSender;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CurrentUsageSenderImpl;
 import pl.wut.wsd.dsm.agent.customer_agent.core.CustomerObligationService;
 import pl.wut.wsd.dsm.agent.customer_agent.core.OffersService;
-import pl.wut.wsd.dsm.agent.customer_agent.core.history.ObigationHistoryLocalStore;
-import pl.wut.wsd.dsm.agent.customer_agent.core.history.OfferHistoryLocalStore;
 import pl.wut.wsd.dsm.agent.customer_agent.device.Devices;
 import pl.wut.wsd.dsm.agent.customer_agent.notification.NotificationAdapter;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.HibernateCustomerObligationRepository;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.HibernateOfferRepository;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.ApiInitializer;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.mapper.ApiTypesMapper;
 import pl.wut.wsd.dsm.agent.customer_agent.settings.SettingsService;
@@ -27,7 +27,6 @@ import pl.wut.wsd.dsm.infrastructure.discovery.ServiceRegistration;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageHandler;
 import pl.wut.wsd.dsm.infrastructure.messaging.MessageSpecification;
 import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
-import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 import pl.wut.wsd.dsm.protocol.consumption.EnergyConsumptionProtocol;
@@ -48,26 +47,23 @@ public class CustomerAgent extends Agent {
     private Customer customer;
     private Codec codec;
     private NotificationAdapter notificationAdapter;
-    private ObigationHistoryLocalStore obligations;
 
     @Override
     protected void setup() {
         final CustomerAgentDependencies dependencies = (CustomerAgentDependencies) getArguments()[0];
-        obligations = new ObigationHistoryLocalStore();
         javalin = dependencies.getJavalin();
         customer = dependencies.getCustomer();
         codec = dependencies.getCodec();
         final ServiceDiscovery serviceDiscovery = new ServiceDiscovery(this);
         final AgentMessagingCapability capability = AgentMessagingCapability.defaultCapability(serviceDiscovery, this);
-        final OfferHistoryLocalStore offers = new OfferHistoryLocalStore();
         final CustomerObligationService offerObligationService = new CustomerObligationService(
                 capability,
                 codec,
                 customer,
                 new ApiTypesMapper(),
                 customerDraftProtocol.acceptClientDecision(),
-                obligations,
-                offers
+                new HibernateCustomerObligationRepository(dependencies.getHibernateTemplate()),
+                new HibernateOfferRepository(dependencies.getHibernateTemplate())
         );
         notificationAdapter = dependencies.getNotificationAdapter();
 
@@ -95,15 +91,15 @@ public class CustomerAgent extends Agent {
 
     private void saveObligation(final ACLMessage aclMessage) {
         log.info("Got obligation acceptance from handler!");
-        final CustomerObligation obligation = codec.decode(aclMessage.getContent(), customerDraftProtocol.informOfCustomerHandlerAcceptance().getMessageClass()).result();
-        obligations.registerCurrentObligation(obligation);
+//        final CustomerObligation obligation = codec.decode(aclMessage.getContent(), customerDraftProtocol.informOfCustomerHandlerAcceptance().getMessageClass()).result();
+        //TODO maybe notification
     }
 
 
     private void processClientOffer(final ACLMessage aclMessage) {
         log.info("Got client offer!");
         final CustomerOffer offer = codec.decode(aclMessage.getContent(), customerDraftProtocol.sendCustomerOffer().getMessageClass()).result();
-        offersService.registerOffer(offer);
+
 //        notificationAdapter.sendNotification(new CustomerNotification("Masz nową wiadomość mordo", codec.encode(offer)));
         //Send customer notification
     }

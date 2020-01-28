@@ -17,4 +17,6 @@ public interface CustomerObligationRepository {
     Optional<Obligation> findByRelatedOfferId(final UUID relatedOfferId);
 
     boolean isResolved(Long obligationId);
+
+    List<Obligation> findAll();
 }

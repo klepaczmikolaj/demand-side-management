@@ -6,11 +6,10 @@ import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationRepre
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ObligationsService {
 
-    Optional<ObligationRepresentation> getCurrentObligation();
+    List<ObligationRepresentation> getCurrentObligations();
 
     List<ObligationRepresentation> getObligationHistory();
 

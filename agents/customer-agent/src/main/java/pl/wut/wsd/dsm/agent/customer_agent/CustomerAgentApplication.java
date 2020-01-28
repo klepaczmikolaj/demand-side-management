@@ -1,13 +1,18 @@
 package pl.wut.wsd.dsm.agent.customer_agent;
 
+import com.mysql.jdbc.Driver;
 import io.javalin.Javalin;
 import io.javalin.core.JavalinConfig;
 import jade.wrapper.AgentContainer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.Options;
+import org.hibernate.dialect.MySQL8Dialect;
 import pl.wut.dsm.ontology.customer.Customer;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Obligation;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Offer;
 import pl.wut.wsd.dsm.agent.external.google.GoogleNotificationsAdapter;
 import pl.wut.wsd.dsm.infrastructure.codec.Codec;
+import pl.wut.wsd.dsm.infrastructure.persistence.hibernate.HibernateTemplate;
 import pl.wut.wsd.dsm.infrastructure.properties.config.AgentConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.CommandLineConfiguration;
 import pl.wut.wsd.dsm.infrastructure.properties.config.FileConfiguration;
@@ -16,6 +21,8 @@ import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupInfoImpl;
 import pl.wut.wsd.dsm.infrastructure.startup.AgentStartupManager;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
 
 @Slf4j
 public class CustomerAgentApplication {
@@ -26,24 +33,31 @@ public class CustomerAgentApplication {
     private static final String customerIdOption = "cid";
     private static final String firebaseToken = "firebaseToken";
     private static final String notificationsTokenKey = "notificationApiToken";
+    private static final String dbUrlConfigKey = "dbUrl";
+    private static final String dbUserConfigKey = "dbUser";
+    private static final String dbPassConfigKey = "dbPass";
 
     private static final AgentStartupManager startupManager = new AgentStartupManager();
     private static final String notificationCustomerIdKey = "notificationId";
 
     public static void main(final String[] args) throws Exception {
         final Options options = new Options();
-        options.addOption(configFileOption, true, "Path to configuration file");
-        options.addOption(mainContainerOption, true, "Main container path");
-        options.addOption(mainContainerPortOption, true, "Main container port");
-        options.addOption(customerIdOption, true, "Customer id");
-        options.addOption(firebaseToken, true, "Firebase token");
-        options.addOption(notificationsTokenKey, true, "Google notifications constant");
-        options.addOption(notificationCustomerIdKey, true, "Customer google notifications id");
+        options.addOption(configFileOption, true, "Path to configuration file")
+                .addOption(mainContainerOption, true, "Main container path")
+                .addOption(mainContainerPortOption, true, "Main container port")
+                .addOption(customerIdOption, true, "Customer id")
+                .addOption(firebaseToken, true, "Firebase token")
+                .addOption(notificationsTokenKey, true, "Google notifications constant")
+                .addOption(notificationCustomerIdKey, true, "Customer google notifications id")
+                .addOption(dbUrlConfigKey, true, "Database connection url")
+                .addOption(dbUserConfigKey, true, "DatabaseLogin")
+                .addOption(dbPassConfigKey, true, "Database password");
 
         final AgentConfiguration initialConfiguration = CommandLineConfiguration.of(options, args).throwingGet(Exception::new);
         final AgentConfiguration updatedConfiguration = initialConfiguration.getProperty(configFileOption, Paths::get)
                 .map(FileConfiguration::fromPath)
                 .map(r -> r.throwingGetRuntime(RuntimeException::new))
+                .map(o -> o.merge(initialConfiguration, AgentConfiguration.AgentConfigurationPriority.OTHER))
                 .map(AgentConfiguration.class::cast)
                 .orElse(initialConfiguration);
 
@@ -62,10 +76,23 @@ public class CustomerAgentApplication {
         final String customerNotificationId = updatedConfiguration.getProperty(notificationCustomerIdKey)
                 .orElseThrow(() -> new MissingConfigEntryException(notificationCustomerIdKey, "Notification customer id (String)"));
 
+        final String dbUrl = updatedConfiguration.getProperty(dbUrlConfigKey)
+                .orElseThrow(() -> new MissingConfigEntryException(dbUrlConfigKey, "Db url (url)"));
+
+
+        final String dbLogin = updatedConfiguration.getProperty(dbUserConfigKey)
+                .orElseThrow(() -> new MissingConfigEntryException(dbUserConfigKey, "Database user name(String)"));
+
+
+        final String dbPass = updatedConfiguration.getProperty(dbPassConfigKey)
+                .orElseThrow(() -> new MissingConfigEntryException(dbPassConfigKey, "Database user password(String)"));
 
         final AgentContainer container = createAgentContainer(hostname, containerPort, customerID);
 
         final Javalin javalin = startJavalin(customerID.intValue());
+
+        final HibernateTemplate template = new HibernateTemplate(dbUrl, dbLogin, dbPass, Driver.class, MySQL8Dialect.class,
+                new HashSet<>(Arrays.asList(pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Customer.class, Offer.class, Obligation.class)));
 
         final CustomerAgentDependencies dependencies = CustomerAgentDependencies.builder()
                 .customer(new Customer(customerID))
@@ -73,7 +100,7 @@ public class CustomerAgentApplication {
                 .javalinPort(customerID.intValue())
                 .codec(Codec.json())
                 .notificationAdapter(new GoogleNotificationsAdapter(notificationKey, customerNotificationId))
-
+                .hibernateTemplate(template)
                 .build();
 
         startupManager.startAgent(container, CustomerAgent.class, "customer-agent" + customerID, dependencies);

@@ -18,11 +18,11 @@ public interface CustomerAgentApiHandle {
 
     Result<List<ObligationRepresentation>, ApiError> getObligationHistory();
 
-    Result<CustomerOfferRepresentation, ApiError> getCurrentOffer();
+    Result<List<CustomerOfferRepresentation>, ApiError> getCurrentOffer();
 
     Result<List<CustomerOfferRepresentation>, ApiError> getOffersHistory();
 
-    Result<ObligationRepresentation, ApiError> getCurrentObligation();
+    Result<List<ObligationRepresentation>, ApiError> getCurrentObligation();
 
     Result<CustomerSettings, ApiError> updateCustomerSettings(CustomerSettings customerSettings);
 

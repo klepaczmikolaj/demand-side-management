@@ -14,7 +14,6 @@ public class CustomerOfferRepresentation {
     private double sizeKws;
     private ObligationType type;
     private double amountPerKWh;
-    private double notExceeding;
     private ZonedDateTime offerEndDateTime;
     private List<DeviceSwitchRecommendation> devicesToTurnOff;
     private List<DeviceSwitchRecommendation> devicesToTurnOn;

@@ -14,4 +14,7 @@ public class ObligationRepresentation {
     private ZonedDateTime since;
     private ZonedDateTime until;
     private ObligationType type;
+    private String state;
+    private Double notExceedingKws;
+    private Double notBelowKws;
 }

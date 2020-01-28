@@ -6,8 +6,9 @@ import jade.lang.acl.ACLMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import pl.wut.dsm.ontology.customer.Customer;
-import pl.wut.wsd.dsm.agent.customer_agent.core.history.ObigationHistoryLocalStore;
-import pl.wut.wsd.dsm.agent.customer_agent.core.history.OfferHistoryLocalStore;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Offer;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.CustomerObligationRepository;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.repo.CustomerOfferRepository;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.mapper.ApiTypesMapper;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.ApiError;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.CustomerOfferRepresentation;
@@ -18,7 +19,6 @@ import pl.wut.wsd.dsm.infrastructure.common.function.CollectionTransformer;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 import pl.wut.wsd.dsm.infrastructure.messaging.handle.AgentMessagingCapability;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
-import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
 import pl.wut.wsd.dsm.protocol.CustomerDraftProtocol;
 
 import java.time.ZonedDateTime;
@@ -35,32 +35,32 @@ public class CustomerObligationService implements ObligationsService, OffersServ
     private final Customer customer;
     private final ApiTypesMapper mapper;
     private final CustomerDraftProtocol.AcceptClientDecision acceptClientDecision;
-    private final ObigationHistoryLocalStore obligations;
-    private final OfferHistoryLocalStore offers;
+    private final CustomerObligationRepository obligationRepository;
+    private final CustomerOfferRepository offerRepository;
 
     @Override
-    public Optional<ObligationRepresentation> getCurrentObligation() {
-        return obligations.getCurrentObligation().map(o -> mapper.toRepresentation(o, offers.findById(o.getRelatedOfferId()).get()));
+    public List<ObligationRepresentation> getCurrentObligations() {
+        return CollectionTransformer.mapToList(obligationRepository.getAllUnresolved(customer.getCustomerId()), mapper::toRepresentation);
     }
 
     @Override
     public List<ObligationRepresentation> getObligationHistory() {
-        return CollectionTransformer.mapToList(obligations.getHistory(), o -> mapper.toRepresentation(o, offers.findById(o.getRelatedOfferId()).get()));
+        return CollectionTransformer.mapToList(obligationRepository.findAll(), mapper::toRepresentation);
     }
 
     @Override
     public Result<ObligationRepresentation, ApiError> acceptObligation(final ObligationAcceptanceRequest request) {
-        final Optional<CustomerOffer> maybeOffer = offers.findById(request.getRelatedOfferId());
+        final Optional<Offer> maybeOffer = offerRepository.findByOfferId(request.getRelatedOfferId());
 
         if (maybeOffer.isPresent()) {
-            final CustomerOffer relatedOffer = maybeOffer.get();
+            final Offer relatedOffer = maybeOffer.get();
             if (relatedOffer.getValidUntil().isAfter(ZonedDateTime.now())) {
 
                 final ACLMessage message = acceptClientDecision.templatedMessage();
                 final CustomerObligation customerObligation = mapper.toObligation(request, relatedOffer);
                 message.setContent(codec.encode(customerObligation));
                 final Result<Set<AID>, FIPAException> sendResult = messages.send(message, acceptClientDecision.serviceDescription(customer));
-                return sendResult.isValid() ? Result.ok(mapper.toRepresentation(customerObligation, relatedOffer)) : Result.error(ApiError.internal(sendResult.error().getMessage()));
+                return sendResult.isValid() ? Result.ok(mapper.toRepresentation(request, relatedOffer)) : Result.error(ApiError.internal(sendResult.error().getMessage()));
             } else {
                 return Result.error(ApiError.badRequest("Offer has expired"));
             }
@@ -71,17 +71,13 @@ public class CustomerObligationService implements ObligationsService, OffersServ
     }
 
     @Override
-    public Optional<CustomerOfferRepresentation> getCurrentOffer() {
-        return offers.getCurrentOffer().map(mapper::toRepresentation);
+    public List<CustomerOfferRepresentation> getPendingOffers() {
+        return CollectionTransformer.mapToList(offerRepository.getCurrentOffer(customer.getCustomerId()), mapper::toRepresentation);
     }
 
     @Override
     public List<CustomerOfferRepresentation> getOfferHistory() {
-        return CollectionTransformer.mapToList(offers.getHistory(), mapper::toRepresentation);
+        return CollectionTransformer.mapToList(offerRepository.getHistory(customer.getCustomerId()), mapper::toRepresentation);
     }
 
-    @Override
-    public void registerOffer(final CustomerOffer offer) {
-        offers.registerCurrentOffer(offer);
-    }
 }

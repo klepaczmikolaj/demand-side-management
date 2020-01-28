@@ -43,9 +43,9 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
     }
 
     @Override
-    public Result<CustomerOfferRepresentation, ApiError> getCurrentOffer() {
-        return offersService.getCurrentOffer().<Result<CustomerOfferRepresentation, ApiError>>map(Result::ok).
-                orElseGet(() -> Result.error(ApiError.notFound("No current offer for customer")));
+    public Result<List<CustomerOfferRepresentation>, ApiError> getCurrentOffer() {
+        final List<CustomerOfferRepresentation> offers = offersService.getPendingOffers();
+        return offers.isEmpty() ? Result.error(ApiError.notFound("No current offer for customer")) : Result.ok(offers);
     }
 
     @Override
@@ -54,11 +54,10 @@ public class DefaultCustomerApiHandle implements CustomerAgentApiHandle {
     }
 
     @Override
-    public Result<ObligationRepresentation, ApiError> getCurrentObligation() {
-        final Optional<ObligationRepresentation> obligation = obligationsService.getCurrentObligation();
+    public Result<List<ObligationRepresentation>, ApiError> getCurrentObligation() {
+        final List<ObligationRepresentation> obligation = obligationsService.getCurrentObligations();
 
-        return obligation.<Result<ObligationRepresentation, ApiError>>map(Result::ok)
-                .orElseGet(() -> Result.error(ApiError.notFound("No obligation is subject to user realization")));
+        return obligation.isEmpty() ? Result.error(ApiError.notFound("No obligation under realization")) : Result.ok(obligation);
     }
 
     @Override

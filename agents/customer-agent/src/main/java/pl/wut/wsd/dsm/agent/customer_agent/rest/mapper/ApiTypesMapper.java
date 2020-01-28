@@ -1,59 +1,77 @@
 package pl.wut.wsd.dsm.agent.customer_agent.rest.mapper;
 
+import lombok.NonNull;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Obligation;
+import pl.wut.wsd.dsm.agent.customer_agent.persistence.model.Offer;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.CustomerOfferRepresentation;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationAcceptanceRequest;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationRepresentation;
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
-import pl.wut.wsd.dsm.ontology.draft.CustomerOffer;
-import pl.wut.wsd.dsm.ontology.draft.EnergyConsumptionChange;
-
-import java.math.BigDecimal;
+import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 
 public class ApiTypesMapper {
 
-    public CustomerOfferRepresentation toRepresentation(final CustomerOffer offer) {
+    public CustomerOfferRepresentation toRepresentation(final Offer offer) {
         final CustomerOfferRepresentation representation = new CustomerOfferRepresentation();
         representation.setOfferId(offer.getOfferId());
         representation.setOfferEndDateTime(offer.getValidUntil());
-        final EnergyConsumptionChange increase = offer.getEnergyConsumptionChange();
-        representation.setSizeKws(increase.getAvailKws());
-        representation.setDemandChangeStart(increase.getSince());
-        representation.setDemandChangeEnd(increase.getUntil());
-        representation.setType(offer.getType());
+        representation.setSizeKws(offer.getKws());
+        representation.setDemandChangeStart(offer.getDemandChangeSince());
+        representation.setDemandChangeEnd(offer.getDemandChangeUntil());
+        representation.setType(mapType(offer.getType()));
         representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
 
         return representation;
     }
 
-    public CustomerOffer toOffer(final CustomerOfferRepresentation dto) {
-        final CustomerOffer offer = new CustomerOffer();
-        offer.setOfferId(dto.getOfferId());
-        offer.setPricePerKw(BigDecimal.valueOf(dto.getAmountPerKWh()));
-        offer.setValidUntil(dto.getOfferEndDateTime());
-        offer.setType(dto.getType());
-        offer.setEnergyConsumptionChange(new EnergyConsumptionChange(dto.getSizeKws(), dto.getDemandChangeStart(), dto.getOfferEndDateTime()));
-
-        return offer;
-    }
-
-    public CustomerObligation toObligation(final ObligationAcceptanceRequest request, final CustomerOffer relatedOffer) {
+    public CustomerObligation toObligation(final ObligationAcceptanceRequest request, final Offer relatedOffer) {
         final CustomerObligation obligation = new CustomerObligation();
         obligation.setRelatedOfferId(relatedOffer.getOfferId());
         obligation.setKwsChange(request.getKwsAccepted());
-        obligation.setObligationType(relatedOffer.getType());
+        obligation.setObligationType(mapType(relatedOffer.getType()));
 
         return obligation;
     }
 
-    public ObligationRepresentation toRepresentation(final CustomerObligation obligation, final CustomerOffer offer) {
+    public ObligationRepresentation toRepresentation(final Obligation obligation) {
+        @NonNull final Offer offer = obligation.getRelatedOffer();
         final ObligationRepresentation representation = new ObligationRepresentation();
-        representation.setRelatedOfferId(obligation.getRelatedOfferId());
-        representation.setObligationSizeKw(obligation.getKwsChange());
-        representation.setSince(offer.getEnergyConsumptionChange().getSince());
-        representation.setUntil(offer.getEnergyConsumptionChange().getUntil());
-        representation.setType(offer.getType());
-
+        representation.setRelatedOfferId(offer.getOfferId());
+        representation.setObligationSizeKw(obligation.getSizeKws());
+        representation.setSince(offer.getDemandChangeSince());
+        representation.setUntil(offer.getValidUntil());
+        representation.setType(offer.getType() == Offer.Type.REDUCTION ? ObligationType.REDUCTION : ObligationType.INCREASE);
+        if (offer.isReduction()) {
+            final double notAboveWatts = offer.getCustomer().getNominalUsageInWatts() - 1000 * obligation.getSizeKws();
+            representation.setNotExceedingKws(notAboveWatts / 1000);
+        } else {
+            final double notBelowWatts = offer.getCustomer().getNominalUsageInWatts() + 1000 * obligation.getSizeKws();
+            representation.setNotBelowKws(notBelowWatts / 1000);
+        }
         return representation;
     }
 
+    private ObligationType mapType(final Offer.Type type) {
+        return type == Offer.Type.REDUCTION ? ObligationType.REDUCTION : ObligationType.INCREASE;
+    }
+
+    public ObligationRepresentation toRepresentation(final ObligationAcceptanceRequest request,
+                                                     final Offer relatedOffer) {
+        final ObligationRepresentation representation = new ObligationRepresentation();
+        representation.setRelatedOfferId(relatedOffer.getOfferId());
+        representation.setObligationSizeKw(request.getKwsAccepted());
+        representation.setSince(relatedOffer.getDemandChangeSince());
+        representation.setUntil(relatedOffer.getValidUntil());
+        final ObligationType obligationType = mapType(relatedOffer.getType());
+        representation.setType(obligationType);
+        if (obligationType == ObligationType.REDUCTION) {
+            final double notAboveWatts = relatedOffer.getCustomer().getNominalUsageInWatts() - 1000 * request.getKwsAccepted();
+            representation.setNotExceedingKws(notAboveWatts / 1000);
+        } else {
+            final double notBelowWatts = relatedOffer.getCustomer().getNominalUsageInWatts() + 1000 * request.getKwsAccepted();
+            representation.setNotBelowKws(notBelowWatts / 1000);
+        }
+
+        return representation;
+    }
 }
