@@ -27,7 +27,7 @@ public class NetworkAgentApplication {
     private static final Duration demandProfileRefreshFrequency = Duration.ofSeconds(30);
     private static final Duration productionProfileRefreshFrequency = Duration.ofSeconds(301);
     private static final Duration inbalancementCheckRefresFrequency = Duration.ofMinutes(1);
-    private static final Duration inbalancementCheckAdvancement = Duration.ofHours(1);
+    private static final Duration inbalancementCheckAdvancement = Duration.ofMinutes(2);
     private static final double safetyTreshold = 50;
     private static final ElectricityDemandProfileCalculator demandCalc = new DefaultElectricityDemandProfileCalculator(15, 10000);
     private static final ElectricityProductionProfileCalculator productionCalc = new DefaultElectricityProductionProfileCalculator(250000, 600000);
