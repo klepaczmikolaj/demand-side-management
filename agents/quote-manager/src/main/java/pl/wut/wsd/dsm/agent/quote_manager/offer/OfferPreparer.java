@@ -23,8 +23,8 @@ public class OfferPreparer {
             final double wattsProduction = expectedInbalancement.getExpectedDemandAndProduction().getWattsProduction();
             final CustomerOffer customerOffer = new CustomerOffer();
             customerOffer.setOfferId(UUID.randomUUID());
-            double inbalanceAbsoluteValue  = Math.abs(expectedInbalancement.getExpectedDemandAndProduction().getWattsDemand() - expectedInbalancement.getExpectedDemandAndProduction().getWattsProduction());
-            customerOffer.setPricePerKw(BigDecimal.valueOf(nominalElectricityPrice * inbalanceAbsoluteValue/5000));
+            final double inbalanceAbsoluteValue = Math.abs(expectedInbalancement.getExpectedDemandAndProduction().getWattsDemand() - expectedInbalancement.getExpectedDemandAndProduction().getWattsProduction());
+            customerOffer.setPricePerKw(BigDecimal.valueOf(nominalElectricityPrice * Math.pow(inbalanceAbsoluteValue / 5000, 0.25)));
             customerOffer.setValidUntil(expectedInbalancement.getSince());
             if (wattsDemand > wattsProduction) {
                 customerOffer.setType(ObligationType.REDUCTION);
