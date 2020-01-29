@@ -126,7 +126,9 @@ public class NetworkAgent extends Agent {
             }
 
             private boolean safetyTresholdNotKept(final DemandAndProduction demandAndProduction) {
-                return demandAndProduction.getWattsProduction() - demandAndProduction.getWattsDemand() < dependencies.safetyTresholdWatts();
+                boolean b = demandAndProduction.getWattsProduction() - demandAndProduction.getWattsDemand() < dependencies.safetyTresholdWatts();
+                log.info("Safety treshold kept? {}", !b);
+                return b;
             }
 
             private double averageBetween(final long steps,
