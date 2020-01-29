@@ -20,7 +20,7 @@ public class ConsumptionEvaluator {
 
     private double calculateTimeNotKept(final Customer customer, final Obligation obligation, final List<EnergyConsumption> consumptions) {
         if (consumptions == null) {
-            log.error("Consumptions for obligation {} are null, returning valid, please fix" + obligation.getId());
+            log.error("Consumptions for obligation {} are null, returning valid, please fix", obligation.getId());
             return 100;
         }
         final Map<Boolean, List<EnergyConsumption>> isKept = consumptions.stream()

@@ -59,9 +59,9 @@ public class CustomerOfferHandler extends ParsingHandler<CustomerOffer, Customer
     private void persistOffer(final Customer customer, final CustomerOffer customerOffer) {
         final pl.wut.wsd.dsm.agent.customerHandler.domain.model.Customer customerEntity = customerRepository.findByCustomerId(customer.getCustomerId()).get();
         if (customerOffer.getType() == ObligationType.REDUCTION) {
-            double max = Math.max(customerEntity.getNominalUsageInWatts() - customerOffer.getEnergyConsumptionChange().getAvailKws() * 1000,
+            final double max = Math.max(customerEntity.getNominalUsageInWatts() - customerOffer.getEnergyConsumptionChange().getAvailKws() * 1000,
                     0.5 * customerEntity.getNominalUsageInWatts());
-            customerOffer.getEnergyConsumptionChange().setAvailKws(max/1000);
+            customerOffer.getEnergyConsumptionChange().setAvailKws(max / 1000);
         }
         final Offer offer = customerHandlerTypesMapper.mapToEntity(customerOffer, customerEntity);
         customerOfferRepository.saveOffer(offer);
