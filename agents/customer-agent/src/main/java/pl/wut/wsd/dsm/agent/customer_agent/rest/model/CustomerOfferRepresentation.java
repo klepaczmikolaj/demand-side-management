@@ -4,6 +4,7 @@ import lombok.Data;
 import pl.wut.wsd.dsm.agent.customer_agent.rest.model.device.DeviceSwitchRecommendation;
 import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,6 @@ public class CustomerOfferRepresentation {
     private ZonedDateTime offerEndDateTime;
     private List<DeviceSwitchRecommendation> devicesToTurnOff;
     private List<DeviceSwitchRecommendation> devicesToTurnOn;
-    private ZonedDateTime demandChangeStart;
-    private ZonedDateTime demandChangeEnd;
+    private LocalDateTime demandChangeStart;
+    private LocalDateTime demandChangeEnd;
 }

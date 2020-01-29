@@ -16,8 +16,8 @@ public class ApiTypesMapper {
         representation.setOfferId(offer.getOfferId());
         representation.setOfferEndDateTime(offer.getValidUntil());
         representation.setSizeKws(offer.getKws());
-        representation.setDemandChangeStart(offer.getDemandChangeSince());
-        representation.setDemandChangeEnd(offer.getDemandChangeUntil());
+        representation.setDemandChangeStart(offer.getDemandChangeSince().toLocalDateTime());
+        representation.setDemandChangeEnd(offer.getDemandChangeUntil().toLocalDateTime());
         representation.setType(mapType(offer.getType()));
         representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
 
