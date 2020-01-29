@@ -27,7 +27,7 @@ class HibernateTemplateTest extends Specification {
                 customerId: new Random().nextLong(),
                 state: CustomerObligationState.DURING_EVALUATION,
                 sizeKws: 100.50,
-                perecentageKept: 21.35
+                setPercentageKept: 21.35
         )
 
         when:

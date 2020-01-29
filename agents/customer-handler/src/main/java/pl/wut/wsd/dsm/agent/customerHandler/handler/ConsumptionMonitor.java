@@ -48,7 +48,7 @@ public class ConsumptionMonitor extends ParsingHandler<EnergyConsumption, Energy
         log.info("Performing obligation evaluation for obligation {}", obligation.getId());
         final List<EnergyConsumption> consumptions = consumptionEntries.get(obligation.getId());
         final double kept = evaluator.evaluateToPercentageKept(obligation.getCustomer(), consumptions, obligation);
-        obligation.setPerecentageKept(kept);
+        obligation.setPercentageKept(kept);
 
         repo.saveOrUpdate(obligation);
     }

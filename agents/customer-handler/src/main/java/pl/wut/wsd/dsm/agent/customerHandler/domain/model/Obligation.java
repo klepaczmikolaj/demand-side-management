@@ -48,7 +48,7 @@ public class Obligation extends Identifiable<Long> {
     @Getter
     @Setter
     @Column(name = "percentage_kept")
-    private double perecentageKept;
+    private double percentageKept;
 
     @NonNull
     @OneToOne
@@ -56,7 +56,7 @@ public class Obligation extends Identifiable<Long> {
     private Offer relatedOffer;
 
     public void setPercentageKept(final double percentageKept) {
-        this.perecentageKept = percentageKept;
+        this.percentageKept = percentageKept;
         if (percentageKept >= 100.0) {
             this.state = CustomerObligationState.KEPT;
         } else {
