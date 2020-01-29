@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import pl.wut.wsd.dsm.infrastructure.codec.json.LocalDateTimeAdapter;
 import pl.wut.wsd.dsm.infrastructure.codec.json.ZonedDateTimeAdapter;
 import pl.wut.wsd.dsm.infrastructure.common.function.Result;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -14,6 +16,7 @@ class JsonCodec implements Codec {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting()
             .registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
     @Override

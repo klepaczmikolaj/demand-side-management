@@ -5,7 +5,6 @@ import pl.wut.wsd.dsm.agent.customer_agent.rest.model.device.DeviceSwitchRecomme
 import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +14,7 @@ public class CustomerOfferRepresentation {
     private double sizeKws;
     private ObligationType type;
     private double amountPerKWh;
-    private ZonedDateTime offerEndDateTime;
+    private LocalDateTime offerEndDateTime;
     private List<DeviceSwitchRecommendation> devicesToTurnOff;
     private List<DeviceSwitchRecommendation> devicesToTurnOn;
     private LocalDateTime demandChangeStart;

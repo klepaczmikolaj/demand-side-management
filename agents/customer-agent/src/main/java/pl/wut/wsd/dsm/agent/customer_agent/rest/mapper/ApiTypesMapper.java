@@ -14,7 +14,7 @@ public class ApiTypesMapper {
     public CustomerOfferRepresentation toRepresentation(final Offer offer) {
         final CustomerOfferRepresentation representation = new CustomerOfferRepresentation();
         representation.setOfferId(offer.getOfferId());
-        representation.setOfferEndDateTime(offer.getValidUntil());
+        representation.setOfferEndDateTime(offer.getValidUntil().toLocalDateTime());
         representation.setSizeKws(offer.getKws());
         representation.setDemandChangeStart(offer.getDemandChangeSince().toLocalDateTime());
         representation.setDemandChangeEnd(offer.getDemandChangeUntil().toLocalDateTime());
