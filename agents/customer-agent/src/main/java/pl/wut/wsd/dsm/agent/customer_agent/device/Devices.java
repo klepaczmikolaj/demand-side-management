@@ -36,7 +36,7 @@ public class Devices {
                     .isOn(true)
                     .usage(1500)
                     .build(),
-            Device.builder().id(1L)
+            Device.builder().id(5L)
                     .name("Telewizor")
                     .deviceType(DeviceType.TV)
                     .includeInDsm(true)
