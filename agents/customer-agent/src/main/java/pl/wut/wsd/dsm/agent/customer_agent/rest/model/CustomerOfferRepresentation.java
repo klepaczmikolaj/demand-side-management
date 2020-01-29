@@ -13,6 +13,7 @@ public class CustomerOfferRepresentation {
     private UUID offerId;
     private double sizeKws;
     private ObligationType type;
+    private boolean available;
     private double amountPerKWh;
     private LocalDateTime offerEndDateTime;
     private List<DeviceSwitchRecommendation> devicesToTurnOff;

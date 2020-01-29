@@ -9,6 +9,8 @@ import pl.wut.wsd.dsm.agent.customer_agent.rest.model.obligation.ObligationRepre
 import pl.wut.wsd.dsm.ontology.draft.CustomerObligation;
 import pl.wut.wsd.dsm.ontology.draft.ObligationType;
 
+import java.time.ZonedDateTime;
+
 public class ApiTypesMapper {
 
     public CustomerOfferRepresentation toRepresentation(final Offer offer) {
@@ -20,7 +22,7 @@ public class ApiTypesMapper {
         representation.setDemandChangeEnd(offer.getDemandChangeUntil().toLocalDateTime());
         representation.setType(mapType(offer.getType()));
         representation.setAmountPerKWh(offer.getPricePerKw().doubleValue());
-
+        representation.setAvailable(offer.getObligation() == null && offer.getDemandChangeSince().isAfter(ZonedDateTime.now()));
         return representation;
     }
 
