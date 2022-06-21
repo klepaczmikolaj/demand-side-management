@@ -25,7 +25,7 @@
         <logback.version>1.2.3</logback.version>
         <okhttp.version>4.2.2</okhttp.version>
         <hibernate.version>5.4.9.Final</hibernate.version>
-        <mysql.connector.version>8.0.18</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <!--++++++++++++++++++++Infrastructure++++++++++++++++++-->
         <infrastructure.messaging.version>1.0-SNAPSHOT</infrastructure.messaging.version>
         <infrastructure.common.version>1.0-SNAPSHOT</infrastructure.common.version>
